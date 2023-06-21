@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+root,
+body,
+head {
+  padding: 0;
+  margin: 0;
+  background-color: rgb(194, 219, 255);
+}
+
+.tr-height-limiter {
+  max-height: 100px; /* Defina o limite de altura desejado */
+  overflow: auto; /* Adicione uma barra de rolagem caso o conteúdo exceda o limite de altura */
+}
