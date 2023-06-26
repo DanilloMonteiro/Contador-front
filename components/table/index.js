@@ -2,7 +2,7 @@ import FirstTH from "./firstTH";
 import SecondTH from "./secondTH";
 import TBody from "./tableBody";
 
-export default function Table({ handleSelectChange, contador, change }) {
+export default function Table({}) {
   return (
     <div className="flex justify-center">
       <div
@@ -24,9 +24,9 @@ export default function Table({ handleSelectChange, contador, change }) {
         >
           <thead>
             <FirstTH />
-            <SecondTH handleSelectChange={handleSelectChange} />
+            <SecondTH />
           </thead>
-          <TBody contador={contador} change={change} />
+          <TBody />
         </table>
       </div>
     </div>

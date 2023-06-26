@@ -1,4 +1,8 @@
-export default function SecondTH({ handleSelectChange }) {
+import { RowContext } from "@/context/RowContext";
+import { useContext } from "react";
+
+export default function SecondTH() {
+  const { handleFilterChangeWrapper } = useContext(RowContext);
   return (
     <tr>
       <th
@@ -21,7 +25,7 @@ export default function SecondTH({ handleSelectChange }) {
         <div className="flex flex-row">
           <select
             className="w-[70px] h-[30px] m-2"
-            onChange={handleSelectChange}
+            onChange={handleFilterChangeWrapper}
           >
             <option value="all">all</option>
             <option value="yellow">yellow</option>
@@ -29,7 +33,7 @@ export default function SecondTH({ handleSelectChange }) {
           </select>
           <select
             className="w-[70px] h-[30px] m-2"
-            onChange={handleSelectChange}
+            onChange={handleFilterChangeWrapper}
           >
             <option value="maior">Maior</option>
             <option value="menor">Menor</option>
@@ -52,19 +56,19 @@ export default function SecondTH({ handleSelectChange }) {
         Equipe
       </th>
       <th className="border border-slate-400 min-w-[100px] bg-blue-300  ">P</th>
-      <th className="border border-slate-400 min-w-[100px] bg-green-300  ">
+      <th className="border border-slate-400 min-w-[300px] bg-green-300  ">
         R
       </th>
       <th className="border border-slate-400 min-w-[100px] bg-blue-300  ">P</th>
-      <th className="border border-slate-400 min-w-[100px] bg-green-300  ">
+      <th className="border border-slate-400 min-w-[300px] bg-green-300  ">
         R
       </th>
       <th className="border border-slate-400 min-w-[100px] bg-blue-300  ">P</th>
-      <th className="border border-slate-400 min-w-[100px] bg-green-300  ">
+      <th className="border border-slate-400 min-w-[300px] bg-green-300  ">
         R
       </th>
       <th className="border border-slate-400 min-w-[100px] bg-blue-300  ">P</th>
-      <th className="border border-slate-400 min-w-[100px] bg-green-300  ">
+      <th className="border border-slate-400 min-w-[300px] bg-green-300  ">
         R
       </th>
     </tr>

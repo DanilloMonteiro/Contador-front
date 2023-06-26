@@ -13,18 +13,9 @@ export default function Navbar() {
           </a>
           <a
             className="font-rubik text-3xl text-blue-500 ml-10 hover:text-blue-700 underline"
-            href="/agvs"
+            href="/"
           >
             Tabela de manutenção das mesas
-          </a>
-
-          <a className="self-center ml-auto mr-5" href="/usuario">
-            <Image
-              className="rounded-full hover:bg-blue-200"
-              src="/usuario.png"
-              width={50}
-              height={50}
-            />
           </a>
         </div>
       </div>
