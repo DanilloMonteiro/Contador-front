@@ -1,21 +1,29 @@
 import { RowContext } from "@/context/RowContext";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 
 export default function TBody() {
   const {
-    grayFilterWrapper,
+    isFilterActive1,
+    setFilterActive1,
+    checkR0,
+    dataCheck,
     contador,
-    change,
-    changeSelect,
-    handleDateChange,
+    changeColorCounterWrapper,
+    changeColorSelectWrapper,
+    handleDateChangeRevisionWrapper,
+    handleChangeFilterWrapper,
     handleInputChangeWrapper,
-    handleInputChangeRevision,
-    handleSelectCampChange,
+    handleDateChangeWrapper,
+    handleSelectChangeWrapper,
   } = useContext(RowContext);
 
+  const [isFilterActive2, setFilterActive2] = useState(true);
+  const [isFilterActive3, setFilterActive3] = useState(true);
+  const [isFilterActive4, setFilterActive4] = useState(true);
+
   return (
-    <tbody className="">
-      {contador.map((c) => (
+    <tbody>
+      {contador?.map((c) => (
         <tr key={c._id}>
           <td className="border border-slate-400 h-[35px]">
             <input
@@ -28,7 +36,7 @@ export default function TBody() {
           <td className="border border-slate-400 ...">
             <input
               className={`w-full px-3 py-1 text-center`}
-              onChange={(event) => handleInputChange(event, c._id)}
+              onChange={(event) => handleInputChangeWrapper(event, c._id)}
               value={c.line}
               name="line"
             ></input>
@@ -37,7 +45,7 @@ export default function TBody() {
             <input
               className={`w-full px-3 py-1 text-center`}
               value={c.customer}
-              onChange={(event) => handleInputChange(event, c._id)}
+              onChange={(event) => handleInputChangeWrapper(event, c._id)}
               name="customer"
             ></input>
           </td>
@@ -45,19 +53,52 @@ export default function TBody() {
             <input
               className={`w-full px-3 py-1 text-center`}
               value={c.fluig_number}
-              onChange={(event) => handleInputChange(event, c._id)}
+              onChange={(event) => handleInputChangeWrapper(event, c._id)}
               name="fluig_number"
             ></input>
           </td>
           <td className="border border-slate-400 ...">
             <input
               className={`w-full px-3 py-1 text-center
-                ${change(c.count_number) === "green" ? "bg-green-300" : ""}
-                ${change(c.count_number) === "yellow" ? "bg-yellow-300" : ""}
-                ${change(c.count_number) === "red" ? "bg-red-300" : ""}
+                ${
+                  changeColorCounterWrapper(
+                    c.count_number,
+                    c.revision.R0.checked,
+                    c.revision.R30.checked,
+                    c.revision.R55.checked,
+                    c.revision.R80.checked,
+                    c.revision.R105.checked
+                  ) === "green"
+                    ? "bg-green-300"
+                    : ""
+                }
+                ${
+                  changeColorCounterWrapper(
+                    c.count_number,
+                    c.revision.R0.checked,
+                    c.revision.R30.checked,
+                    c.revision.R55.checked,
+                    c.revision.R80.checked,
+                    c.revision.R105.checked
+                  ) === "yellow"
+                    ? "bg-yellow-300"
+                    : ""
+                }
+                ${
+                  changeColorCounterWrapper(
+                    c.count_number,
+                    c.revision.R0.checked,
+                    c.revision.R30.checked,
+                    c.revision.R55.checked,
+                    c.revision.R80.checked,
+                    c.revision.R105.checked
+                  ) === "red"
+                    ? "bg-red-300"
+                    : ""
+                }
                 `}
               value={c.count_number}
-              onChange={(event) => handleInputChange(event, c._id)}
+              onChange={(event) => handleInputChangeWrapper(event, c._id)}
               name="count_number"
             ></input>
             <input
@@ -74,11 +115,19 @@ export default function TBody() {
           <td className=" border border-slate-400 ...">
             <select
               className={`w-full h-[30px] text-center
-                ${changeSelect(c.counter) === "green" ? "bg-green-300" : ""}
-                ${changeSelect(c.counter) === "red" ? "bg-red-300" : ""}
+                ${
+                  changeColorSelectWrapper(c.counter) === "green"
+                    ? "bg-green-300"
+                    : ""
+                }
+                ${
+                  changeColorSelectWrapper(c.counter) === "red"
+                    ? "bg-red-300"
+                    : ""
+                }
                 `}
               value={c.counter ? "sim" : "nao"}
-              onChange={(event) => handleSelectCampChange(event, c._id)}
+              onChange={(event) => handleSelectChangeWrapper(event, c._id)}
               name="counter"
             >
               <option value="sim">Sim</option>
@@ -88,11 +137,19 @@ export default function TBody() {
           <td className="border border-slate-400 ...">
             <select
               className={`w-full h-[30px] text-center
-                ${changeSelect(c.material) === "green" ? "bg-green-300" : ""}
-                ${changeSelect(c.material) === "red" ? "bg-red-300" : ""}
+                ${
+                  changeColorSelectWrapper(c.material) === "green"
+                    ? "bg-green-300"
+                    : ""
+                }
+                ${
+                  changeColorSelectWrapper(c.material) === "red"
+                    ? "bg-red-300"
+                    : ""
+                }
                 `}
               value={c.material ? "sim" : "nao"}
-              onChange={(event) => handleSelectCampChange(event, c._id)}
+              onChange={(event) => handleSelectChangeWrapper(event, c._id)}
               name="material"
             >
               <option className="bg-white" value="sim">
@@ -111,7 +168,7 @@ export default function TBody() {
                   ? new Date(c.planing_date).toISOString().split("T")[0]
                   : ""
               }
-              onChange={(event) => handleDateChange(event, c._id)}
+              onChange={(event) => handleDateChangeWrapper(event, c._id)}
               name="planing_date"
               type="date"
             ></input>
@@ -132,7 +189,7 @@ export default function TBody() {
               name="team"
             ></input>
           </td>
-          <td className="border border-slate-400 ...">
+          <td className="relative border border-slate-400 ...">
             <div className="flex flex-row">
               <input
                 className={`w-full px-3 py-1 text-center 
@@ -140,41 +197,29 @@ export default function TBody() {
                 ${c.revision.R0.ready === false ? "bg-red-300" : ""}
                 `}
                 value={c.revision.R0.ready}
-                onChange={(event) => handleInputChange(event, c._id)}
-                name=""
+                readOnly
               ></input>
+              {c.revision.R0.ready_filter === true && (
+                <div className="absolute w-full h-full left-0 top-0 bg-black opacity-20"></div>
+              )}
             </div>
           </td>
           <td className={`relative border border-slate-400`}>
             <div className="flex flex-row">
               <input
-                className={`w-full px-3 py-1 text-center
-                ${c.revision.R0.made === true ? "bg-blue-300" : ""}
-                ${c.revision.R0.made === false ? "bg-red-300" : ""}
-                
-                `}
-                value={c.revision.R0.made}
-                onChange={(event) => handleInputChangeRevision(event, c._id)}
-                name=""
-              ></input>
-              <input
                 className={`w-full px-3 py-1 text-center 
-                ${c.revision.R0.date ? "bg-green-300" : ""}
-                ${"23/07/2002" ? "bg-green-300" : ""}
+                ${c.revision.R0.date ? "bg-green-300" : "bg-green-300"}
                 `}
                 value={
-                  c.revision.R0.made === false || c.revision.R0.ready === false
-                    ? ""
-                    : c.revision.R0.date
+                  c.revision.R0.date
                     ? new Date(c.revision.R0.date).toISOString().split("T")[0]
-                    : ""
+                    : "2023-06-29"
                 }
-                onChange={(event) => handleDateChange(event, c._id)}
-                name="revision.R0.date"
+                readOnly
                 type="date"
               ></input>
-              {c.revision.R0.ready === false && (
-                <div className="absolute top-[0px] w-full h-full opacity-50 bg-gray-500"></div>
+              {c.revision.R0.ready_filter === true && (
+                <div className="absolute w-full h-full left-0 top-0 bg-black opacity-20"></div>
               )}
             </div>
           </td>
@@ -182,74 +227,120 @@ export default function TBody() {
             <div className="flex flex-row">
               <input
                 className={`w-full px-3 py-1 text-center 
-                ${c.revision.R30.ready === true ? "bg-blue-300" : ""}
-                ${c.revision.R30.ready === false ? "bg-red-300" : ""}
+                ${
+                  c.revision?.R30?.ready === true ? "bg-blue-300" : "bg-red-300"
+                }
                 `}
-                value={c.revision.R30.ready}
-                onChange={(event) => handleInputChange(event, c._id)}
-                name=""
+                value={c.revision?.R30?.ready}
+                readOnly
               ></input>
-              {grayFilterWrapper(c.revision.R0.made, c.revision.R0.ready) ===
-                false && (
-                <div className="absolute top-[0px] w-full h-full opacity-50 bg-gray-500"></div>
+              {c.revision.R30.ready_filter === true && (
+                <div className="absolute w-full h-full left-0 top-0 bg-black opacity-20"></div>
+              )}
+            </div>
+          </td>
+          <td
+            className={`relative border border-slate-400`}
+            onClick={(event) =>
+              handleChangeFilterWrapper(event, c.revision.R30.checked, c._id)
+            }
+            name="revision.R30.date"
+          >
+            <div className="flex flex-row">
+              <input
+                className={`w-full px-3 py-1 text-center 
+                ${c.revision?.R30?.date ? "bg-green-300" : "bg-red-300"}
+                `}
+                value={
+                  c.revision?.R30?.date
+                    ? new Date(c.revision?.R30?.date)
+                        .toISOString()
+                        .split("T")[0]
+                    : ""
+                }
+                onChange={(event) =>
+                  handleDateChangeRevisionWrapper(event, c._id)
+                }
+                name="revision.R30.date"
+                type="date"
+              ></input>
+              {isFilterActive1 && c.revision.R30.date_filter === true && (
+                <div className="absolute w-full h-full left-0 top-0 bg-black opacity-20"></div>
+              )}
+            </div>
+          </td>
+          <td className="relative border border-slate-400 ...">
+            <div className="flex flex-row">
+              <input
+                className={`w-full px-3 py-1 text-center 
+                ${c.revision.R55.ready === true ? "bg-blue-300" : ""}
+                ${c.revision.R55.ready === false ? "bg-red-300" : ""}
+                `}
+                value={c.revision.R55.ready}
+                readOnly
+              ></input>
+              {c.revision.R55.ready_filter === true && (
+                <div className="absolute w-full h-full left-0 top-0 bg-black opacity-20"></div>
               )}
             </div>
           </td>
           <td className={`relative border border-slate-400`}>
             <div className="flex flex-row">
               <input
-                className={`w-full px-3 py-1 text-center
-                ${c.revision.R30.made === true ? "bg-blue-300" : ""}
-                ${c.revision.R30.made === false ? "bg-red-300" : ""}
-                
-                `}
-                value={c.revision.R30.made}
-                onChange={(event) => handleInputChangeRevision(event, c._id)}
-                name=""
-              ></input>
-              <input
                 className={`w-full px-3 py-1 text-center 
-                ${c.revision.R30.date ? "bg-green-300" : ""}
-                ${"23/07/2002" ? "bg-green-300" : ""}
+                ${c.revision.R55.date ? "bg-green-300" : "bg-red-300"}
                 `}
-                value={c.revision.R30.made === false ? "" : c.revision.R30.date}
-                onChange={(event) => handleInputChange(event, c._id)}
-                name=""
+                value={
+                  c.revision.R55.date
+                    ? new Date(c.revision.R55.date).toISOString().split("T")[0]
+                    : ""
+                }
+                onChange={(event) =>
+                  handleDateChangeRevisionWrapper(event, c._id)
+                }
+                name="revision.R55.date"
                 type="date"
               ></input>
-              {c.revision.R30.ready === false && (
-                <div className="absolute top-[0px] w-full h-full opacity-50 bg-gray-500"></div>
+              {c.revision.R55.date_filter === true && (
+                <div className="absolute w-full h-full left-0 top-0 bg-black opacity-20"></div>
               )}
             </div>
           </td>
-          <td className="border border-slate-400 ...">
+          <td className="relative border border-slate-400 ...">
             <div className="flex flex-row">
               <input
-                className={`w-full px-3 py-1 text-center `}
-                value={""}
-                onChange={(event) => handleInputChange(event, c._id)}
-                name=""
+                className={`w-full px-3 py-1 text-center 
+                ${c.revision.R80.ready === true ? "bg-blue-300" : ""}
+                ${c.revision.R80.ready === false ? "bg-red-300" : ""}
+                `}
+                value={c.revision.R80.ready}
+                readOnly
               ></input>
+              {c.revision.R80.ready_filter === true && (
+                <div className="absolute w-full h-full left-0 top-0 bg-black opacity-20"></div>
+              )}
             </div>
           </td>
-          <td className="border border-slate-400 ...">
+          <td className={`relative border border-slate-400`}>
             <div className="flex flex-row">
               <input
-                className={`w-full px-3 py-1 text-center `}
-                value={""}
-                onChange={(event) => handleInputChange(event, c._id)}
-                name=""
+                className={`w-full px-3 py-1 text-center 
+                ${c.revision.R80.date ? "bg-green-300" : "bg-red-300"}
+                `}
+                value={
+                  c.revision.R80.date
+                    ? new Date(c.revision.R80.date).toISOString().split("T")[0]
+                    : ""
+                }
+                onChange={(event) =>
+                  handleDateChangeRevisionWrapper(event, c._id)
+                }
+                name="revision.R80.date"
+                type="date"
               ></input>
-            </div>
-          </td>
-          <td className="border border-slate-400 ...">
-            <div className="flex flex-row">
-              <input
-                className={`w-full px-3 py-1 text-center `}
-                value={""}
-                onChange={(event) => handleInputChange(event, c._id)}
-                name=""
-              ></input>
+              {c.revision.R80.date_filter === true && (
+                <div className="absolute w-full h-full left-0 top-0 bg-black opacity-20"></div>
+              )}
             </div>
           </td>
         </tr>
@@ -279,4 +370,44 @@ function triggerAlert() {
 
   // Atualize a data da última chamada para a data atual
   lastCallDate = currentDate;
+}
+
+{
+  /* <td className="relative border border-slate-400 ...">
+            <div className="flex flex-row">
+              <input
+                className={`w-full px-3 py-1 text-center 
+                ${c.revision.R0.ready === true ? "bg-blue-300" : ""}
+                ${c.revision.R0.ready === false ? "bg-red-300" : ""}
+                `}
+                value={c.revision.R0.ready}
+                readOnly
+              ></input>
+              {c.revision.R0.ready_filter === true && (
+                <div className="absolute w-full h-full left-0 top-0 bg-black opacity-20"></div>
+              )}
+            </div>
+          </td>
+          <td className={`relative border border-slate-400`}>
+            <div className="flex flex-row">
+              <input
+                className={`w-full px-3 py-1 text-center 
+                ${c.revision.R0.date ? "bg-green-300" : "bg-red-300"}
+                `}
+                value={
+                  c.revision.R0.date
+                    ? new Date(c.revision.R0.date).toISOString().split("T")[0]
+                    : ""
+                }
+                onChange={(event) =>
+                  handleDateChangeRevisionWrapper(event, c._id)
+                }
+                name="revision.R0.date"
+                type="date"
+              ></input>
+              {c.revision.R0.date_filter === true && (
+                <div className="absolute w-full h-full left-0 top-0 bg-black opacity-20"></div>
+              )}
+            </div>
+          </td> */
 }

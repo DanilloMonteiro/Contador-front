@@ -3,30 +3,40 @@ import ContadorServices from "@/services/contador";
 import handleInputChange from "@/functions/handlers/handleInputChange";
 import searchFilter from "@/functions/filters/searchFilter";
 import handleFilterChange from "@/functions/handlers/handleFilterChange";
-import filterGray from "@/functions/filters/grayFilter";
+import handleSelectChange from "@/functions/handlers/handleSelectChange";
+import changeColorCounter from "@/functions/filters/changeColorCounter";
+import changeColorSelect from "@/functions/filters/changeColorSelect";
+import { handleDateChange } from "@/functions/handlers/dataChange/handleDateChange";
+import handleInputChangeRevision from "@/functions/handlers/handleInputChangeRevision";
+import handleDateChangeRevision from "@/functions/handlers/dataChange/revision/handleDateChangeRevision";
+import handleChangeFilter from "@/functions/handlers/handleChangeFilter";
 
 export const RowContext = createContext();
 
 export const RowProvider = ({ children }) => {
   const [contador, setContador] = useState([]);
+
   const [camposAmarelos, setCamposAmarelos] = useState([]);
   const [camposVermelhos, setCamposVermelhos] = useState([]);
   const [maior, setMaior] = useState([]);
   const [menor, setMenor] = useState([]);
   const [padrao, setPadrao] = useState([]);
+  const [stop, setStop] = useState();
+
+  const [isFilterActive1, setFilterActive1] = useState(true);
+
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [selectedDate, setSelectedDate] = useState("");
-  const [selectedName, setSelectedName] = useState("");
-  const [itemId, setItemId] = useState("");
+
+  const [planingdate, setPlaningdate] = useState();
 
   async function fetchContador() {
     const response = await ContadorServices.index();
     if (response.data.length >= 1) {
       const camposFiltradosAmarelos = response.data.filter(
-        (c) => change(c.count_number) === "yellow"
+        (c) => changeColorCounterWrapper(c.count_number) === "yellow"
       );
       const camposFiltradosVermelhos = response.data.filter(
-        (c) => change(c.count_number) === "red"
+        (c) => changeColorCounterWrapper(c.count_number) === "red"
       );
 
       const sortedDataMaior = [...response.data].sort(
@@ -37,165 +47,261 @@ export const RowProvider = ({ children }) => {
         (a, b) => a.count_number - b.count_number
       );
 
+      const valuePlaningdate = response.data.map((c) => {
+        return c.planing_date;
+      });
+
+      const checkFields = () => {
+        const updatedData = response.data.map((item) => {
+          let activedRevision;
+          let nextRevision;
+          let stop;
+          if (item.revision.R0.checked === false) {
+            activedRevision = "R0";
+            nextRevision = "R30";
+            stop = 0;
+          } else if (item.revision.R30.checked === false) {
+            activedRevision = "R30";
+            nextRevision = "R55";
+            stop = 25000;
+          } else if (item.revision.R55.checked === false) {
+            activedRevision = "R55";
+            nextRevision = "R80";
+            stop = 50000;
+          } else if (item.revision.R80.checked === false) {
+            activedRevision = "R80";
+            nextRevision = "R105";
+            stop = 75000;
+          } else if (item.revision.R105.checked === false) {
+            activedRevision = "R105";
+          } else {
+            null;
+          }
+
+          let formattedDate = null;
+
+          if (item.planing_date) {
+            const date = new Date(item.planing_date);
+            formattedDate = date.toISOString().split("T")[0];
+          }
+
+          const datetimeRegex = /^\d{4}-\d{2}-\d{2}$/;
+          //
+          // Comfere se tem = MATEIRAL, CONTAGEM, DATA DE PLANEJAMENTO
+          //
+          if (
+            item.material === true &&
+            item.count_number >= stop &&
+            datetimeRegex.test(formattedDate)
+          ) {
+            //
+            // Devolve DATA_FILTER = FALSE || READY = TRUE
+            // DESATIVA O FILTRO DA DATA
+            //
+            console.log("Checagem 1");
+            return {
+              ...item,
+              revision: {
+                ...item.revision,
+                R0: {
+                  ready: true,
+                  ready_filter: true,
+                  date_filter: true,
+                },
+                [activedRevision]: {
+                  ...item.revision[activedRevision],
+                  ready: true,
+                  date_filter: false,
+                },
+              },
+            };
+          } else {
+            //
+            // Devolve DATA_FILTER = TRUE || READY = FALSE
+            // ATIVA O FILTRO DA DATA E ZERA A DATA
+            //
+            console.log("Checagem 1 false");
+            return {
+              ...item,
+              revision: {
+                ...item.revision,
+                R0: {
+                  ready: true,
+                  ready_filter: true,
+                  date_filter: true,
+                },
+                [activedRevision]: {
+                  ...item.revision[activedRevision],
+                  ready: false,
+                  date_filter: true,
+                  date: "",
+                },
+              },
+            };
+          }
+        });
+
+        const updatedData2 = updatedData.map((item) => {
+          let activedRevision;
+          let nextRevision;
+          let stop;
+          if (item.revision.R0.checked === false) {
+            activedRevision = "R0";
+            nextRevision = "R30";
+            stop = 0;
+          } else if (item.revision.R30.checked === false) {
+            activedRevision = "R30";
+            nextRevision = "R55";
+            stop = 25000;
+          } else if (item.revision.R55.checked === false) {
+            activedRevision = "R55";
+            nextRevision = "R80";
+            stop = 50000;
+          } else if (item.revision.R80.checked === false) {
+            activedRevision = "R80";
+            nextRevision = "R105";
+            stop = 75000;
+          } else if (item.revision.R105.checked === false) {
+            activedRevision = "R105";
+          } else {
+            null;
+          }
+
+          let formattedRevisionDate = null;
+          if (item.revision[activedRevision].date) {
+            const date = new Date(item.revision[activedRevision].date);
+            formattedRevisionDate = date.toISOString().split("T")[0];
+          }
+
+          let formattedValueDate = null;
+          if (item.planing_date) {
+            const date = new Date(item.planing_date);
+            formattedValueDate = date.toISOString().split("T")[0];
+          }
+
+          const datetimeRegex = /^\d{4}-\d{2}-\d{2}$/;
+          //
+          // Comfere se tem = PLANEJADO A MANUTENCAO ""P""
+          // E SE TEM A DATA QUE FOI FEITA ""R""
+          //
+          if (
+            item.revision[activedRevision].ready === true &&
+            datetimeRegex.test(formattedRevisionDate)
+          ) {
+            //
+            // Devolve CASO TENHA OS DADOS ELE TRAVA OS CAMPOS JA PREENCHIDO E
+            // LIBERA O PROXIMO CAMPO NO CASO O 30000
+            // DATE_FILTER = TRUE || READY_FILTER = TRUE || READY_FILTER = FALSE (R30 )
+            //
+            console.log("Checagem 2 ");
+
+            return {
+              ...item,
+              revision: {
+                ...item.revision,
+                [activedRevision]: {
+                  ...item.revision[activedRevision],
+                  date_filter: true,
+                  ready_filter: true,
+                },
+                [nextRevision]: {
+                  ...item.revision[nextRevision],
+                  ready_filter: false,
+                },
+              },
+            };
+          } else if (
+            item.material === true &&
+            item.count_number >= stop &&
+            datetimeRegex.test(formattedValueDate)
+          ) {
+            //
+            // Confere novamente: MATERIAL, CONTAGEM E DATA PLANEJADA
+            // DATE_FILTER = TRUE || READY_FILTER = FALSE || READY_FILTER = TRUE (R55 )
+            //
+            console.log("Checagem 2 false");
+
+            return {
+              ...item,
+              revision: {
+                ...item.revision,
+                [activedRevision]: {
+                  ...item.revision[activedRevision],
+                  date_filter: false,
+                  ready_filter: false,
+                },
+                [nextRevision]: {
+                  ...item.revision[nextRevision],
+                  ready_filter: true,
+                },
+              },
+            };
+          } else {
+            //
+            // CASO NAO CAIA EM NENHUM IF VEM AQUI (PODE ESTAR ERRADO)
+            //
+            console.log("Checagem 2 false 2");
+
+            return {
+              ...item,
+              revision: {
+                ...item.revision,
+                [activedRevision]: {
+                  ...item.revision[activedRevision],
+                  date_filter: true,
+                  ready_filter: false,
+                },
+                [nextRevision]: {
+                  ...item.revision[nextRevision],
+                  ready_filter: true,
+                },
+              },
+            };
+          }
+        });
+
+        //
+        // FAZ O UPDATE NO BANCO DE DADOS
+        //
+        updatedData2.forEach((item) => {
+          ContadorServices.update(item._id, item)
+            .then((response) => {
+              console.log(
+                `Item com ID ${item._id} atualizado com sucesso no banco de dados .`
+              );
+            })
+            .catch((error) => {
+              console.error(
+                `Erro ao atualizar o item com ID ${item._id} no banco de dados:`,
+                error
+              );
+            });
+        });
+
+        return updatedData2;
+      };
+
+      setFilterActive1(true);
+      setPlaningdate(valuePlaningdate);
       setMaior(sortedDataMaior);
       setMenor(sortedDataMenor);
       setCamposVermelhos(camposFiltradosVermelhos);
       setCamposAmarelos(camposFiltradosAmarelos);
-      setContador(response.data);
-      setPadrao(response.data);
+      setContador(checkFields());
+      setPadrao(checkFields());
     }
   }
 
-  function revisionReady() {
-    const uploadedContador = contador.map((c) => {
-      if (c.planing_date && c.count_number > 25000 && c.material === true) {
-        c.revision.R0.ready = true;
-      } else {
-        c.revision.R0.ready = false;
-      }
-    });
-
-    setContador(uploadedContador);
-  }
-
-  const handleSelectCampChange = (event, itemId) => {
-    const { name, value } = event.target;
-
-    setContador((prevContador) => {
-      const updatedContador = prevContador.map((item) => {
-        if (item._id === itemId) {
-          return {
-            ...item,
-            [name]: value === "sim" ? true : false,
-          };
-        }
-        return item;
-      });
-
-      updatedContador.forEach((item) => {
-        if (item._id === itemId) {
-          ContadorServices.update(item._id, item)
-            .then((response) => {
-              console.log(
-                `Item com ID ${item._id} atualizado com sucesso no banco de dados.`
-              );
-            })
-            .catch((error) => {
-              console.error(
-                `Erro ao atualizar o item com ID ${item._id} no banco de dados:`,
-                error
-              );
-            });
-        }
-      });
-
-      revisionReady();
-
-      return updatedContador;
-    });
+  const handleSelectChangeWrapper = (event, itemId) => {
+    handleSelectChange(event, itemId, setContador, ContadorServices);
   };
 
-  const handleDateChange = (event, itemId) => {
-    const { name, value } = event.target;
-    setItemId(itemId);
-    setSelectedDate(value);
-    setSelectedName(name);
-    setShowConfirmation(true);
+  const handleDateChangeRevisionWrapper = (event, itemId) => {
+    handleDateChangeRevision(event, itemId, setContador, ContadorServices);
   };
 
-  const cancelDateChange = () => {
-    setSelectedDate("");
-    setSelectedName("");
-    setShowConfirmation(false);
-  };
-
-  const confirmDateChange = () => {
-    setContador((prevContador) => {
-      const splited = selectedName.split(".");
-
-      const updatedContador = prevContador.map((item) => {
-        if (item._id === itemId) {
-          return {
-            ...item,
-            [splited[0]]: {
-              ...item.revision,
-              [splited[1]]: {
-                ...item.revision.R0,
-                [splited[2]]: selectedDate
-                  ? new Date(selectedDate).toISOString().split("T")[0]
-                  : null,
-              },
-            },
-          };
-        }
-
-        return item;
-      });
-
-      updatedContador.forEach((item) => {
-        if (item._id === itemId) {
-          ContadorServices.update(item._id, item)
-            .then((response) => {
-              console.log(
-                `Item com ID ${item._id} atualizado com sucesso no banco de dados com a data  ${item.revision.R0.date} date.`
-              );
-            })
-            .catch((error) => {
-              console.error(
-                `Erro ao atualizar o item com ID ${item._id} no banco de dados:`,
-                error
-              );
-            });
-        }
-      });
-
-      revisionReady();
-
-      return updatedContador;
-    });
-
-    setShowConfirmation(false);
-  };
-
-  const handleInputChangeRevision = (event, itemId) => {
-    const { name, value } = event.target;
-
-    const fieldParts = name.split(".");
-
-    setContador((prevContador) => {
-      const updatedContador = prevContador.map((item) => {
-        if (item._id === itemId) {
-          return {
-            ...item,
-            [fieldParts[0]]: {
-              [fieldParts[1]]: {
-                [fieldParts[2]]: value,
-              },
-            },
-          };
-        }
-        return item;
-      });
-
-      updatedContador.forEach((item) => {
-        if (item._id === itemId) {
-          ContadorServices.update(item._id, item)
-            .then((response) => {
-              console.log(
-                `Item com ID ${item._id} atualizado com sucesso no banco de dados.`
-              );
-            })
-            .catch((error) => {
-              console.error(
-                `Erro ao atualizar o item com ID ${item._id} no banco de dados:`,
-                error
-              );
-            });
-        }
-      });
-
-      return updatedContador;
-    });
+  const handleInputChangeRevisionWrapper = (event, itemId) => {
+    handleInputChangeRevision(event, itemId, setContador, ContadorServices);
   };
 
   const handleInputChangeWrapper = (event, itemId) => {
@@ -214,46 +320,53 @@ export const RowProvider = ({ children }) => {
     );
   };
 
+  const handleDateChangeWrapper = (event, itemId) => {
+    return handleDateChange(
+      event,
+      itemId,
+      setContador,
+      ContadorServices,
+      setShowConfirmation
+    );
+  };
+
+  const handleChangeFilterWrapper = (event, checked, itemId, contador) => {
+    handleChangeFilter(event, checked, itemId, contador, setContador);
+  };
+
   const searchFilterWrapper = (pesquisa) => {
     searchFilter(pesquisa, padrao, setContador);
   };
 
-  const grayFilterWrapper = (made, ready) => {
-    filterGray(made, ready);
+  const changeColorSelectWrapper = (value) => {
+    return changeColorSelect(value);
   };
 
-  const stop = 30000;
+  const changeColorCounterWrapper = (
+    value,
+    R0_checked,
+    R30_checked,
+    R55_checked,
+    R80_checked,
+    R105_checked
+  ) => {
+    return changeColorCounter(
+      value,
+      R0_checked,
+      R30_checked,
+      R55_checked,
+      R80_checked,
+      R105_checked
+    );
+  };
 
-  const nextPrev = stop - 5000;
-
-  const danger = (value) => {
-    if (value >= stop) {
-      return "red";
-    } else if (value >= nextPrev) {
-      return "yellow";
-    } else if (value < nextPrev) {
-      return "green";
+  const checkR0 = (ready, date) => {
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (dateRegex.test(date) && ready == true) {
+      return true;
+    } else {
+      return false;
     }
-  };
-
-  const dangerSelect = (value) => {
-    if (value === true) {
-      return "green";
-    } else if (value === false) {
-      return "red";
-    }
-  };
-
-  const changeSelect = (value) => {
-    const color = dangerSelect(value);
-
-    return color;
-  };
-
-  const change = (value) => {
-    const color = danger(value);
-
-    return color;
   };
 
   useEffect(() => {
@@ -263,20 +376,23 @@ export const RowProvider = ({ children }) => {
   return (
     <RowContext.Provider
       value={{
-        showConfirmation,
-        confirmDateChange,
-        grayFilterWrapper,
-        cancelDateChange,
+        isFilterActive1,
+        setFilterActive1,
+        checkR0,
+        planingdate,
         contador,
-        change,
-        changeSelect,
-        searchFilterWrapper,
         fetchContador,
-        handleDateChange,
+        showConfirmation,
+        changeColorCounterWrapper,
+        changeColorSelectWrapper,
+        searchFilterWrapper,
+        handleDateChangeRevisionWrapper,
         handleFilterChangeWrapper,
         handleInputChangeWrapper,
-        handleSelectCampChange,
-        handleInputChangeRevision,
+        handleSelectChangeWrapper,
+        handleChangeFilterWrapper,
+        handleDateChangeWrapper,
+        handleInputChangeRevisionWrapper,
       }}
     >
       {children}

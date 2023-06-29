@@ -7,9 +7,8 @@ import { useContext } from "react";
 export default function Home() {
   const {
     showConfirmation,
-
-    confirmDateChange,
-    cancelDateChange,
+    confirmDateChangeRevisionWrapper,
+    cancelDateChangeRevisionWrapper,
   } = useContext(RowContext);
 
   return (
@@ -30,13 +29,13 @@ export default function Home() {
               <div className="flex flex-row justify-between mt-[85px]">
                 <button
                   className="bg-blue-200 px-4 py-2 hover:bg-blue-300"
-                  onClick={() => confirmDateChange()}
+                  onClick={() => confirmDateChangeRevisionWrapper()}
                 >
                   Confirmar
                 </button>
                 <button
                   className="bg-blue-200 px-4 py-2 hover:bg-blue-300"
-                  onClick={cancelDateChange}
+                  onClick={cancelDateChangeRevisionWrapper}
                 >
                   Cancelar
                 </button>
