@@ -2,12 +2,12 @@ export default function handleChangeFilter(
   event,
   checked,
   itemId,
-  contador,
+  ContadorServices,
   setContador
 ) {
-  const { name, value } = event.target;
+  const name = event.currentTarget.dataset.name;
 
-  console.log(name, "logo");
+  const splited = name.split(".");
 
   setContador((prevContador) => {
     const updatedContador = prevContador.map((item) => {
@@ -18,13 +18,32 @@ export default function handleChangeFilter(
             ...item.revision,
             [splited[1]]: {
               ...item.revision[splited[1]],
-              [splited[2]]: value
-                ? new Date(value).toISOString().split("T")[0]
-                : null,
+              [splited[2]]: false,
             },
           },
         };
+      } else {
+        return item;
       }
     });
+
+    updatedContador.forEach((item) => {
+      if (item._id === itemId) {
+        ContadorServices.update(item._id, item)
+          .then((response) => {
+            console.log(
+              `Item com ID ${item._id} atualizado com sucesso no banco de dados com a data ${item.revision.R0.date}.`
+            );
+          })
+          .catch((error) => {
+            console.error(
+              `Erro ao atualizar o item com ID ${item._id} no banco de dados:`,
+              error
+            );
+          });
+      }
+    });
+
+    return updatedContador;
   });
 }

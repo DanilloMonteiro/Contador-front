@@ -10,6 +10,11 @@ import { handleDateChange } from "@/functions/handlers/dataChange/handleDateChan
 import handleInputChangeRevision from "@/functions/handlers/handleInputChangeRevision";
 import handleDateChangeRevision from "@/functions/handlers/dataChange/revision/handleDateChangeRevision";
 import handleChangeFilter from "@/functions/handlers/handleChangeFilter";
+import handleSimpleSelectChange from "@/functions/handlers/handleSimplesSelectChange";
+import handleCheckboxChange from "@/functions/handlers/handleCheckboxChange";
+import handleCheckboxChange2 from "@/functions/handlers/handleCheckboxChange";
+import oneYearFunction from "@/functions/filters/oneYearFunction";
+import handleDateChangeRevision2 from "@/functions/handlers/dataChange/revision/handleDateChangeRevision2";
 
 export const RowContext = createContext();
 
@@ -21,41 +26,53 @@ export const RowProvider = ({ children }) => {
   const [maior, setMaior] = useState([]);
   const [menor, setMenor] = useState([]);
   const [padrao, setPadrao] = useState([]);
-  const [stop, setStop] = useState();
+  const [desabilitadas, setDesabilitadas] = useState([]);
+  const [habilitados2, setHabilitados] = useState([]);
 
   const [isFilterActive1, setFilterActive1] = useState(true);
 
-  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [openAddTable, setOpenAddTable] = useState(false);
+  const [openTimeRevision, setOpenTimeRevision] = useState(false);
+  const [openDesableTable, setOpenDesableTable] = useState(false);
 
   const [planingdate, setPlaningdate] = useState();
 
   async function fetchContador() {
     const response = await ContadorServices.index();
-    if (response.data.length >= 1) {
-      const camposFiltradosAmarelos = response.data.filter(
-        (c) => changeColorCounterWrapper(c.count_number) === "yellow"
+
+    const desabilitados = response.data.filter((c) => c.desabled === true);
+    const habilitados = response.data.filter((c) => c.desabled === false);
+
+    setHabilitados(habilitados);
+    setDesabilitadas(desabilitados);
+
+    if (habilitados.length >= 1) {
+      const camposFiltradosAmarelos = habilitados.filter(
+        (c) => changeColorCounterWrapper(c) === "yellow"
       );
-      const camposFiltradosVermelhos = response.data.filter(
-        (c) => changeColorCounterWrapper(c.count_number) === "red"
+      const camposFiltradosVermelhos = habilitados.filter(
+        (c) => changeColorCounterWrapper(c) === "red"
       );
 
-      const sortedDataMaior = [...response.data].sort(
+      const sortedDataMaior = [...habilitados].sort(
         (a, b) => b.count_number - a.count_number
       );
 
-      const sortedDataMenor = [...response.data].sort(
+      const sortedDataMenor = [...habilitados].sort(
         (a, b) => a.count_number - b.count_number
       );
 
-      const valuePlaningdate = response.data.map((c) => {
+      const valuePlaningdate = habilitados.map((c) => {
         return c.planing_date;
       });
 
       const checkFields = () => {
-        const updatedData = response.data.map((item) => {
+        const updatedData = habilitados.map((item) => {
+          oneYearFunctionWrapper(item);
           let activedRevision;
           let nextRevision;
           let stop;
+          let days30 = 30;
           if (item.revision.R0.checked === false) {
             activedRevision = "R0";
             nextRevision = "R30";
@@ -77,6 +94,30 @@ export const RowProvider = ({ children }) => {
           } else {
             null;
           }
+          let timeRevisionActual;
+          if (item.revision.time1.checked === false) {
+            timeRevisionActual = "time1";
+          } else if (item.revision.time2.checked === false) {
+            timeRevisionActual = "time2";
+          } else if (item.revision.time3.checked === false) {
+            timeRevisionActual = "time3";
+          }
+
+          if (item.revision.checked === true) {
+            return {
+              ...item,
+              [splited[0]]: {
+                ...item.revision,
+                [splited[1]]: {
+                  ...item.revision[splited[1]],
+                  [splited[2]]: value
+                    ? new Date(value).toISOString().split("T")[0]
+                    : null,
+                  date_filter: true,
+                },
+              },
+            };
+          }
 
           let formattedDate = null;
 
@@ -89,21 +130,27 @@ export const RowProvider = ({ children }) => {
           //
           // Comfere se tem = MATEIRAL, CONTAGEM, DATA DE PLANEJAMENTO
           //
+
           if (
-            item.material === true &&
-            item.count_number >= stop &&
-            datetimeRegex.test(formattedDate)
+            (item.material === true &&
+              item.count_number >= stop &&
+              datetimeRegex.test(formattedDate)) ||
+            (item.material === true &&
+              item.date_revision <= days30 &&
+              item.count_number >= stop - 5000 &&
+              datetimeRegex.test(formattedDate))
           ) {
             //
             // Devolve DATA_FILTER = FALSE || READY = TRUE
             // DESATIVA O FILTRO DA DATA
             //
-            console.log("Checagem 1");
+
             return {
               ...item,
               revision: {
                 ...item.revision,
                 R0: {
+                  ...item.revision.R0,
                   ready: true,
                   ready_filter: true,
                   date_filter: true,
@@ -115,17 +162,51 @@ export const RowProvider = ({ children }) => {
                 },
               },
             };
-          } else {
-            //
-            // Devolve DATA_FILTER = TRUE || READY = FALSE
-            // ATIVA O FILTRO DA DATA E ZERA A DATA
-            //
-            console.log("Checagem 1 false");
+          } else if (
+            (item.material === true &&
+              item.count_number >= stop &&
+              datetimeRegex.test(formattedDate)) ||
+            (item.material === true &&
+              item.date_revision <= days30 &&
+              item.count_number <= stop - 5000 &&
+              datetimeRegex.test(formattedDate))
+          ) {
             return {
               ...item,
               revision: {
                 ...item.revision,
                 R0: {
+                  ...item.revision.R0,
+                  ready: true,
+                  ready_filter: true,
+                  date_filter: true,
+                },
+                [activedRevision]: {
+                  ...item.revision[activedRevision],
+                  ready: false,
+                  ready_filter: true,
+                  date_filter: true,
+                },
+                [timeRevisionActual]: {
+                  ...item.revision[timeRevisionActual],
+                  ready: true,
+                  ready_filter: false,
+                  date_filter: false,
+                },
+              },
+            };
+          } else {
+            //
+            // Devolve DATA_FILTER = TRUE || READY = FALSE
+            // ATIVA O FILTRO DA DATA E ZERA A DATA
+            //
+
+            return {
+              ...item,
+              revision: {
+                ...item.revision,
+                R0: {
+                  ...item.revision.R0,
                   ready: true,
                   ready_filter: true,
                   date_filter: true,
@@ -145,6 +226,7 @@ export const RowProvider = ({ children }) => {
           let activedRevision;
           let nextRevision;
           let stop;
+          let days30 = 30;
           if (item.revision.R0.checked === false) {
             activedRevision = "R0";
             nextRevision = "R30";
@@ -165,6 +247,14 @@ export const RowProvider = ({ children }) => {
             activedRevision = "R105";
           } else {
             null;
+          }
+          let timeRevisionActual;
+          if (item.revision.time1.checked === false) {
+            timeRevisionActual = "time1";
+          } else if (item.revision.time2.checked === false) {
+            timeRevisionActual = "time2";
+          } else if (item.revision.time3.checked === false) {
+            timeRevisionActual = "time3";
           }
 
           let formattedRevisionDate = null;
@@ -193,8 +283,6 @@ export const RowProvider = ({ children }) => {
             // LIBERA O PROXIMO CAMPO NO CASO O 30000
             // DATE_FILTER = TRUE || READY_FILTER = TRUE || READY_FILTER = FALSE (R30 )
             //
-            console.log("Checagem 2 ");
-
             return {
               ...item,
               revision: {
@@ -211,16 +299,18 @@ export const RowProvider = ({ children }) => {
               },
             };
           } else if (
-            item.material === true &&
-            item.count_number >= stop &&
-            datetimeRegex.test(formattedValueDate)
+            (item.material === true &&
+              item.count_number >= stop &&
+              datetimeRegex.test(formattedValueDate)) ||
+            (item.material === true &&
+              item.date_revision <= days30 &&
+              item.count_number >= stop - 5000 &&
+              datetimeRegex.test(formattedValueDate))
           ) {
             //
             // Confere novamente: MATERIAL, CONTAGEM E DATA PLANEJADA
             // DATE_FILTER = TRUE || READY_FILTER = FALSE || READY_FILTER = TRUE (R55 )
             //
-            console.log("Checagem 2 false");
-
             return {
               ...item,
               revision: {
@@ -234,13 +324,51 @@ export const RowProvider = ({ children }) => {
                   ...item.revision[nextRevision],
                   ready_filter: true,
                 },
+                [timeRevisionActual]: {
+                  ...item.revision[timeRevisionActual],
+                  ready: false,
+                  ready_filter: true,
+                  date_filter: true,
+                },
+              },
+            };
+          } else if (
+            (item.material === true &&
+              item.count_number >= stop &&
+              datetimeRegex.test(formattedValueDate)) ||
+            (item.material === true &&
+              item.date_revision <= days30 &&
+              item.count_number <= stop - 5000 &&
+              datetimeRegex.test(formattedValueDate))
+          ) {
+            return {
+              ...item,
+              revision: {
+                ...item.revision,
+                R0: {
+                  ...item.revision.R0,
+                  ready: true,
+                  ready_filter: true,
+                  date_filter: true,
+                },
+                [activedRevision]: {
+                  ...item.revision[activedRevision],
+                  ready: false,
+                  ready_filter: true,
+                  date_filter: true,
+                },
+                [timeRevisionActual]: {
+                  ...item.revision[timeRevisionActual],
+                  ready: true,
+                  ready_filter: false,
+                  date_filter: false,
+                },
               },
             };
           } else {
             //
             // CASO NAO CAIA EM NENHUM IF VEM AQUI (PODE ESTAR ERRADO)
             //
-            console.log("Checagem 2 false 2");
 
             return {
               ...item,
@@ -255,6 +383,12 @@ export const RowProvider = ({ children }) => {
                   ...item.revision[nextRevision],
                   ready_filter: true,
                 },
+                [timeRevisionActual]: {
+                  ...item.revision[timeRevisionActual],
+                  ready: false,
+                  ready_filter: true,
+                  date_filter: true,
+                },
               },
             };
           }
@@ -265,11 +399,7 @@ export const RowProvider = ({ children }) => {
         //
         updatedData2.forEach((item) => {
           ContadorServices.update(item._id, item)
-            .then((response) => {
-              console.log(
-                `Item com ID ${item._id} atualizado com sucesso no banco de dados .`
-              );
-            })
+            .then((response) => {})
             .catch((error) => {
               console.error(
                 `Erro ao atualizar o item com ID ${item._id} no banco de dados:`,
@@ -300,8 +430,16 @@ export const RowProvider = ({ children }) => {
     handleDateChangeRevision(event, itemId, setContador, ContadorServices);
   };
 
+  const handleDateChangeRevisionWrapper2 = (event, itemId) => {
+    handleDateChangeRevision2(event, itemId, setContador, ContadorServices);
+  };
+
   const handleInputChangeRevisionWrapper = (event, itemId) => {
     handleInputChangeRevision(event, itemId, setContador, ContadorServices);
+  };
+
+  const handleSimpleSelectChangeWrapper = (event, itemId) => {
+    handleSimpleSelectChange(event, itemId, setContador, ContadorServices);
   };
 
   const handleInputChangeWrapper = (event, itemId) => {
@@ -321,43 +459,40 @@ export const RowProvider = ({ children }) => {
   };
 
   const handleDateChangeWrapper = (event, itemId) => {
-    return handleDateChange(
+    return handleDateChange(event, itemId, setContador, ContadorServices);
+  };
+
+  const handleCheckboxChangeWrapper = (event, itemId) => {
+    return handleCheckboxChange(
       event,
       itemId,
-      setContador,
-      ContadorServices,
-      setShowConfirmation
+      setDesabilitadas,
+      ContadorServices
     );
   };
 
-  const handleChangeFilterWrapper = (event, checked, itemId, contador) => {
-    handleChangeFilter(event, checked, itemId, contador, setContador);
+  const handleCheckboxChangeWrapper2 = (event, itemId) => {
+    return handleCheckboxChange2(event, itemId, setContador, ContadorServices);
+  };
+
+  const handleChangeFilterWrapper = (event, checked, itemId) => {
+    handleChangeFilter(event, checked, itemId, ContadorServices, setContador);
   };
 
   const searchFilterWrapper = (pesquisa) => {
     searchFilter(pesquisa, padrao, setContador);
   };
 
+  const oneYearFunctionWrapper = (c) => {
+    return oneYearFunction(c, setContador, ContadorServices);
+  };
+
   const changeColorSelectWrapper = (value) => {
     return changeColorSelect(value);
   };
 
-  const changeColorCounterWrapper = (
-    value,
-    R0_checked,
-    R30_checked,
-    R55_checked,
-    R80_checked,
-    R105_checked
-  ) => {
-    return changeColorCounter(
-      value,
-      R0_checked,
-      R30_checked,
-      R55_checked,
-      R80_checked,
-      R105_checked
-    );
+  const changeColorCounterWrapper = (c) => {
+    return changeColorCounter(c);
   };
 
   const checkR0 = (ready, date) => {
@@ -378,15 +513,29 @@ export const RowProvider = ({ children }) => {
       value={{
         isFilterActive1,
         setFilterActive1,
+        camposAmarelos,
+        camposVermelhos,
         checkR0,
         planingdate,
+        desabilitadas,
         contador,
         fetchContador,
-        showConfirmation,
+        habilitados2,
+        openAddTable,
+        openTimeRevision,
+        setOpenTimeRevision,
+        openDesableTable,
+        setOpenDesableTable,
+        setOpenAddTable,
+        oneYearFunctionWrapper,
         changeColorCounterWrapper,
         changeColorSelectWrapper,
         searchFilterWrapper,
+        handleSimpleSelectChangeWrapper,
         handleDateChangeRevisionWrapper,
+        handleDateChangeRevisionWrapper2,
+        handleCheckboxChangeWrapper,
+        handleCheckboxChangeWrapper2,
         handleFilterChangeWrapper,
         handleInputChangeWrapper,
         handleSelectChangeWrapper,

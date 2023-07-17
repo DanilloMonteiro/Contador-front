@@ -1,24 +1,25 @@
-export default function handleInputChange(
+export default function handleCheckboxChange2(
   event,
   itemId,
   setContador,
   ContadorServices
 ) {
-  const { name, value } = event.target;
+  const { name, checked } = event.target;
 
-  console.log(value, "auqii");
-  console.log(name, "name");
+  console.log(name, checked, "a111111");
 
   setContador((prevContador) => {
     const updatedContador = prevContador.map((item) => {
       if (item._id === itemId) {
         return {
           ...item,
-          [name]: value,
+          [name]: checked,
         };
       }
       return item;
     });
+
+    console.log(updatedContador, "aqui222");
 
     updatedContador.forEach((item) => {
       if (item._id === itemId) {

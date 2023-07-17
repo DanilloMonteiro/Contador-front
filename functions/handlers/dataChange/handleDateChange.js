@@ -1,10 +1,4 @@
-export function handleDateChange(
-  event,
-  itemId,
-  setContador,
-  ContadorServices,
-  setShowConfirmation
-) {
+export function handleDateChange(event, itemId, setContador, ContadorServices) {
   const { name, value } = event.target;
 
   let formattedValue = null;
@@ -14,12 +8,15 @@ export function handleDateChange(
     formattedValue = date.toISOString().split("T")[0];
   }
 
+  console.log(value, "value");
+
   setContador((prevContador) => {
     const updatedContador = prevContador.map((item) => {
       if (itemId === item._id) {
         let activedRevision;
         let nextRevision;
         let stop;
+        let days30 = 30;
         if (item.revision.R0.checked === false) {
           activedRevision = "R0";
           nextRevision = "R30";
@@ -41,6 +38,14 @@ export function handleDateChange(
         } else {
           null;
         }
+        let timeRevisionActual;
+        if (item.revision.time1.checked === false) {
+          timeRevisionActual = "time1";
+        } else if (item.revision.time2.checked === false) {
+          timeRevisionActual = "time2";
+        } else if (item.revision.time3.checked === false) {
+          timeRevisionActual = "time3";
+        }
 
         const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -48,10 +53,15 @@ export function handleDateChange(
         // Comfere se tem = MATEIRAL, CONTAGEM E DATA DE PLANEJAMENTO
         //
         if (
-          item._id === itemId &&
-          item.material === true &&
-          item.count_number >= stop &&
-          dateRegex.test(formattedValue)
+          (item._id === itemId &&
+            item.material === true &&
+            item.count_number >= stop &&
+            dateRegex.test(formattedValue)) ||
+          (item._id === itemId &&
+            item.material === true &&
+            item.count_number >= stop - 5000 &&
+            item.date_revision <= days30 &&
+            dateRegex.test(formattedValue))
         ) {
           //
           // Devolve DATA_FILTER = FALSE || READY = TRUE
@@ -67,6 +77,40 @@ export function handleDateChange(
                 ...item.revision[activedRevision],
                 data_filter: false,
                 ready: true,
+              },
+            },
+          };
+        } else if (
+          (item.material === true &&
+            item.count_number >= stop &&
+            dateRegex.test(formattedValue)) ||
+          (item.material === true &&
+            item.date_revision <= days30 &&
+            item.count_number <= stop - 5000 &&
+            dateRegex.test(formattedValue))
+        ) {
+          return {
+            ...item,
+            [name]: formattedValue,
+            revision: {
+              ...item.revision,
+              R0: {
+                ...item.revision.R0,
+                ready: true,
+                ready_filter: true,
+                date_filter: true,
+              },
+              [activedRevision]: {
+                ...item.revision[activedRevision],
+                ready: false,
+                ready_filter: true,
+                date_filter: true,
+              },
+              [timeRevisionActual]: {
+                ...item.revision[timeRevisionActual],
+                ready: true,
+                ready_filter: false,
+                date_filter: false,
               },
             },
           };
@@ -86,6 +130,12 @@ export function handleDateChange(
                 ready: false,
                 date_filter: true,
                 date: "",
+              },
+              [timeRevisionActual]: {
+                ...item.revision[timeRevisionActual],
+                ready: false,
+                ready_filter: true,
+                date_filter: true,
               },
             },
           };
@@ -122,6 +172,14 @@ export function handleDateChange(
           activedRevision = "R105";
         } else {
           null;
+        }
+        let timeRevisionActual;
+        if (item.revision.time1.checked === false) {
+          timeRevisionActual = "time1";
+        } else if (item.revision.time2.checked === false) {
+          timeRevisionActual = "time2";
+        } else if (item.revision.time3.checked === false) {
+          timeRevisionActual = "time3";
         }
 
         let formattedRevisionDate = null;
@@ -168,9 +226,13 @@ export function handleDateChange(
             },
           };
         } else if (
-          item.material === true &&
-          item.count_number >= stop &&
-          datetimeRegex.test(formattedValueDate)
+          (item.material === true &&
+            item.count_number >= stop &&
+            datetimeRegex.test(formattedValueDate)) ||
+          (item.material === true &&
+            item.count_number >= stop - 5000 &&
+            item.date_revision <= 30 &&
+            datetimeRegex.test(formattedValueDate))
         ) {
           //
           // Confere novamente: MATERIAL, CONTAGEM E DATA PLANEJADA
@@ -190,6 +252,40 @@ export function handleDateChange(
               [nextRevision]: {
                 ...item.revision[nextRevision],
                 ready_filter: true,
+              },
+            },
+          };
+        } else if (
+          (item.material === true &&
+            item.count_number >= stop &&
+            datetimeRegex.test(formattedValueDate)) ||
+          (item.material === true &&
+            item.count_number <= stop - 5000 &&
+            item.date_revision <= 30 &&
+            datetimeRegex.test(formattedValueDate))
+        ) {
+          return {
+            ...item,
+            [name]: formattedValue,
+            revision: {
+              ...item.revision,
+              R0: {
+                ...item.revision.R0,
+                ready: true,
+                ready_filter: true,
+                date_filter: true,
+              },
+              [activedRevision]: {
+                ...item.revision[activedRevision],
+                ready: false,
+                ready_filter: true,
+                date_filter: true,
+              },
+              [timeRevisionActual]: {
+                ...item.revision[timeRevisionActual],
+                ready: true,
+                ready_filter: false,
+                date_filter: false,
               },
             },
           };

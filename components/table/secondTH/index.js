@@ -14,7 +14,7 @@ export default function SecondTH() {
       <th className="border border-slate-400 min-w-[100px] bg-gray-300">
         Linha
       </th>
-      <th className="border border-slate-400 min-w-[100px] bg-gray-300">
+      <th className="border border-slate-400 min-w-[120px] bg-gray-300">
         Cliente
       </th>
       <th className="border border-slate-400 min-w-[100px] bg-gray-300">
@@ -27,9 +27,9 @@ export default function SecondTH() {
             className="w-[70px] h-[30px] m-2"
             onChange={handleFilterChangeWrapper}
           >
-            <option value="all">all</option>
-            <option value="yellow">yellow</option>
-            <option value="red">red</option>
+            <option value="all">Todos</option>
+            <option value="yellow">Amarelo</option>
+            <option value="red">Vermelho</option>
           </select>
           <select
             className="w-[70px] h-[30px] m-2"
@@ -44,6 +44,9 @@ export default function SecondTH() {
         Contador?
       </th>
       <th className="border border-slate-400 min-w-[100px] bg-gray-300">
+        Mesa digital?
+      </th>
+      <th className="border border-slate-400 min-w-[100px] bg-gray-300">
         Material disponivel?
       </th>
       <th className="border border-slate-400 min-w-[110px] bg-gray-300">
@@ -56,19 +59,34 @@ export default function SecondTH() {
         Equipe
       </th>
       <th className="border border-slate-400 min-w-[100px] bg-blue-300  ">P</th>
-      <th className="border border-slate-400 min-w-[300px] bg-green-300  ">
+      <th className="border border-slate-400 min-w-[100px] bg-green-300  ">
         R
       </th>
       <th className="border border-slate-400 min-w-[100px] bg-blue-300  ">P</th>
-      <th className="border border-slate-400 min-w-[300px] bg-green-300  ">
+      <th className="border border-slate-400 min-w-[100px] bg-green-300  ">
         R
       </th>
       <th className="border border-slate-400 min-w-[100px] bg-blue-300  ">P</th>
-      <th className="border border-slate-400 min-w-[300px] bg-green-300  ">
+      <th className="border border-slate-400 min-w-[100px] bg-green-300  ">
         R
       </th>
       <th className="border border-slate-400 min-w-[100px] bg-blue-300  ">P</th>
-      <th className="border border-slate-400 min-w-[300px] bg-green-300  ">
+      <th className="border border-slate-400 min-w-[100px] bg-green-300  ">
+        R
+      </th>
+      <th className="border border-slate-400 min-w-[120px] bg-gray-300  ">
+        Desabilitada
+      </th>
+      <th className="border border-slate-400 min-w-[100px] bg-blue-300  ">P</th>
+      <th className="border border-slate-400 min-w-[100px] bg-green-300  ">
+        R
+      </th>
+      <th className="border border-slate-400 min-w-[100px] bg-blue-300  ">P</th>
+      <th className="border border-slate-400 min-w-[100px] bg-green-300  ">
+        R
+      </th>
+      <th className="border border-slate-400 min-w-[100px] bg-blue-300  ">P</th>
+      <th className="border border-slate-400 min-w-[100px] bg-green-300  ">
         R
       </th>
     </tr>

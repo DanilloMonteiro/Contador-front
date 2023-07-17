@@ -1,4 +1,4 @@
-export default function handleInputChange(
+export default function handleSimpleSelectChange(
   event,
   itemId,
   setContador,
@@ -6,18 +6,18 @@ export default function handleInputChange(
 ) {
   const { name, value } = event.target;
 
-  console.log(value, "auqii");
-  console.log(name, "name");
+  console.log(value, "value");
 
   setContador((prevContador) => {
     const updatedContador = prevContador.map((item) => {
-      if (item._id === itemId) {
+      if (itemId === item._id) {
         return {
           ...item,
-          [name]: value,
+          [name]: value === "sim" ? true : false,
         };
+      } else {
+        return item;
       }
-      return item;
     });
 
     updatedContador.forEach((item) => {
@@ -25,7 +25,7 @@ export default function handleInputChange(
         ContadorServices.update(item._id, item)
           .then((response) => {
             console.log(
-              `Item com ID ${item._id} atualizado com sucesso no banco de dados.`
+              `Item com ID ${item._id} atualizado com sucesso no banco de dados ${item.digital_table}.`
             );
           })
           .catch((error) => {

@@ -1,4 +1,4 @@
-export default function handleDateChangeRevision(
+export default function handleDateChangeRevision2(
   event,
   itemId,
   setContador,
@@ -146,14 +146,10 @@ export default function handleDateChangeRevision(
         const datetimeRegex = /^\d{4}-\d{2}-\d{2}$/;
 
         if (
-          (item._id === itemId &&
-            datetimeRegex.test(formattedValue) &&
-            item.material === true &&
-            item.count_number >= stop) ||
-          (item._id === itemId &&
-            datetimeRegex.test(formattedValue) &&
-            item.material === true &&
-            item.date_revision <= days30)
+          item._id === itemId &&
+          datetimeRegex.test(formattedValue) &&
+          item.material === true &&
+          item.count_number >= stop
         ) {
           return {
             ...item,
@@ -173,6 +169,7 @@ export default function handleDateChangeRevision(
                   : null,
                 ready_filter: true,
                 date_filter: true,
+                ready: true,
                 checked: true,
               },
             },
@@ -187,7 +184,7 @@ export default function handleDateChangeRevision(
                 [splited[2]]: value
                   ? new Date(value).toISOString().split("T")[0]
                   : null,
-                checked: false,
+                checked: true,
               },
             },
           };

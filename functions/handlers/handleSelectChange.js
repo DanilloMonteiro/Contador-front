@@ -12,6 +12,7 @@ export default function handleSelectChange(
         let activedRevision;
         let nextRevision;
         let stop;
+        let days30 = 30;
         if (item.revision.R0.checked === false) {
           activedRevision = "R0";
           nextRevision = "R30";
@@ -33,6 +34,14 @@ export default function handleSelectChange(
         } else {
           null;
         }
+        let timeRevisionActual;
+        if (item.revision.time1.checked === false) {
+          timeRevisionActual = "time1";
+        } else if (item.revision.time2.checked === false) {
+          timeRevisionActual = "time2";
+        } else if (item.revision.time3.checked === false) {
+          timeRevisionActual = "time3";
+        }
 
         let formattedDate = null;
 
@@ -46,10 +55,15 @@ export default function handleSelectChange(
         // Comfere se tem = MATEIRAL, CONTAGEM, DATA DE PLANEJAMENTO
         //
         if (
-          item._id === itemId &&
-          value === "sim" &&
-          item.count_number >= stop &&
-          datetimeRegex.test(formattedDate)
+          (item._id === itemId &&
+            value === "sim" &&
+            item.count_number >= stop &&
+            datetimeRegex.test(formattedDate)) ||
+          (item._id === itemId &&
+            value === "sim" &&
+            item.date_revision <= days30 &&
+            item.count_number >= stop - 500 &&
+            datetimeRegex.test(formattedDate))
         ) {
           //
           // Devolve DATA_FILTER = FALSE || READY = TRUE
@@ -64,6 +78,40 @@ export default function handleSelectChange(
               [activedRevision]: {
                 ...item.revision[activedRevision],
                 ready: true,
+                date_filter: false,
+              },
+            },
+          };
+        } else if (
+          (item.material === true &&
+            item.count_number >= stop &&
+            datetimeRegex.test(formattedDate)) ||
+          (item.material === true &&
+            item.date_revision <= days30 &&
+            item.count_number <= stop - 5000 &&
+            datetimeRegex.test(formattedDate))
+        ) {
+          return {
+            ...item,
+            [name]: value === "sim" ? true : false,
+            revision: {
+              ...item.revision,
+              R0: {
+                ...item.revision.R0,
+                ready: true,
+                ready_filter: true,
+                date_filter: true,
+              },
+              [activedRevision]: {
+                ...item.revision[activedRevision],
+                ready: false,
+                ready_filter: true,
+                date_filter: true,
+              },
+              [timeRevisionActual]: {
+                ...item.revision[timeRevisionActual],
+                ready: true,
+                ready_filter: false,
                 date_filter: false,
               },
             },
@@ -96,6 +144,7 @@ export default function handleSelectChange(
       let activedRevision;
       let nextRevision;
       let stop;
+      let days30 = 30;
       if (item.revision.R0.checked === false) {
         activedRevision = "R0";
         nextRevision = "R30";
@@ -116,6 +165,14 @@ export default function handleSelectChange(
         activedRevision = "R105";
       } else {
         null;
+      }
+      let timeRevisionActual;
+      if (item.revision.time1.checked === false) {
+        timeRevisionActual = "time1";
+      } else if (item.revision.time2.checked === false) {
+        timeRevisionActual = "time2";
+      } else if (item.revision.time3.checked === false) {
+        timeRevisionActual = "time3";
       }
 
       let formattedRevisionDate = null;
@@ -161,9 +218,13 @@ export default function handleSelectChange(
           },
         };
       } else if (
-        item.material === true &&
-        item.count_number >= stop &&
-        datetimeRegex.test(formattedValueDate)
+        (item.material === true &&
+          item.count_number >= stop &&
+          datetimeRegex.test(formattedValueDate)) ||
+        (item.material === true &&
+          item.date_revision <= days30 &&
+          item.count_number >= stop - 5000 &&
+          datetimeRegex.test(formattedValueDate))
       ) {
         //
         // Confere novamente: MATERIAL, CONTAGEM E DATA PLANEJADA
@@ -182,6 +243,40 @@ export default function handleSelectChange(
             [nextRevision]: {
               ...item.revision[nextRevision],
               ready_filter: true,
+            },
+          },
+        };
+      } else if (
+        (item.material === true &&
+          item.count_number >= stop &&
+          datetimeRegex.test(formattedValueDate)) ||
+        (item.material === true &&
+          item.date_revision <= days30 &&
+          item.count_number <= stop - 5000 &&
+          datetimeRegex.test(formattedValueDate))
+      ) {
+        return {
+          ...item,
+          [name]: value === "sim" ? true : false,
+          revision: {
+            ...item.revision,
+            R0: {
+              ...item.revision.R0,
+              ready: true,
+              ready_filter: true,
+              date_filter: true,
+            },
+            [activedRevision]: {
+              ...item.revision[activedRevision],
+              ready: false,
+              ready_filter: true,
+              date_filter: true,
+            },
+            [timeRevisionActual]: {
+              ...item.revision[timeRevisionActual],
+              ready: true,
+              ready_filter: false,
+              date_filter: false,
             },
           },
         };

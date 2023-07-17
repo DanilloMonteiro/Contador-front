@@ -12,6 +12,7 @@ export default function handleFilterChange(
   }
 
   if (event.target.value === "yellow") {
+    console.log(camposAmarelos, "auqi");
     setContador(camposAmarelos);
   }
 
