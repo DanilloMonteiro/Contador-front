@@ -3,7 +3,7 @@ import { Titillium_Web, Rubik } from "next/font/google";
 
 const titilliem = Titillium_Web({
   weight: "700",
-  style: ["italic"],
+  style: "italic",
   subsets: ["latin"],
   variable: "--font-titilliem",
 });

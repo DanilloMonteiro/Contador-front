@@ -1,3 +1,5 @@
+import useItemUpdater from "@/hooks/useItemUpdater";
+
 export function handleDateChange(event, itemId, setContador, ContadorServices) {
   const { name, value } = event.target;
 
@@ -317,20 +319,7 @@ export function handleDateChange(event, itemId, setContador, ContadorServices) {
     });
 
     updatedContador2.forEach((item) => {
-      if (item._id === itemId) {
-        ContadorServices.update(item._id, item)
-          .then((response) => {
-            console.log(
-              `Item com ID ${item._id} atualizado com sucesso no banco de dados com a data ${item.revision.R30.date}.`
-            );
-          })
-          .catch((error) => {
-            console.error(
-              `Erro ao atualizar o item com ID ${item._id} no banco de dados:`,
-              error
-            );
-          });
-      }
+      useItemUpdater(itemId, item);
     });
 
     return updatedContador2;

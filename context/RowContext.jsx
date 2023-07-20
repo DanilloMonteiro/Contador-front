@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect } from "react";
+import { handleDateChange } from "@/functions/handlers/dataChange/handleDateChange";
 import ContadorServices from "@/services/contador";
 import handleInputChange from "@/functions/handlers/handleInputChange";
 import searchFilter from "@/functions/filters/searchFilter";
@@ -6,7 +7,6 @@ import handleFilterChange from "@/functions/handlers/handleFilterChange";
 import handleSelectChange from "@/functions/handlers/handleSelectChange";
 import changeColorCounter from "@/functions/filters/changeColorCounter";
 import changeColorSelect from "@/functions/filters/changeColorSelect";
-import { handleDateChange } from "@/functions/handlers/dataChange/handleDateChange";
 import handleInputChangeRevision from "@/functions/handlers/handleInputChangeRevision";
 import handleDateChangeRevision from "@/functions/handlers/dataChange/revision/handleDateChangeRevision";
 import handleChangeFilter from "@/functions/handlers/handleChangeFilter";
@@ -15,6 +15,7 @@ import handleCheckboxChange from "@/functions/handlers/handleCheckboxChange";
 import handleCheckboxChange2 from "@/functions/handlers/handleCheckboxChange";
 import oneYearFunction from "@/functions/filters/oneYearFunction";
 import handleDateChangeRevision2 from "@/functions/handlers/dataChange/revision/handleDateChangeRevision2";
+import useItemUpdater from "@/hooks/useItemUpdater";
 
 export const RowContext = createContext();
 
@@ -30,10 +31,6 @@ export const RowProvider = ({ children }) => {
   const [habilitados2, setHabilitados] = useState([]);
 
   const [isFilterActive1, setFilterActive1] = useState(true);
-
-  const [openAddTable, setOpenAddTable] = useState(false);
-  const [openTimeRevision, setOpenTimeRevision] = useState(false);
-  const [openDesableTable, setOpenDesableTable] = useState(false);
 
   const [planingdate, setPlaningdate] = useState();
 
@@ -70,24 +67,19 @@ export const RowProvider = ({ children }) => {
         const updatedData = habilitados.map((item) => {
           oneYearFunctionWrapper(item);
           let activedRevision;
-          let nextRevision;
           let stop;
           let days30 = 30;
           if (item.revision.R0.checked === false) {
             activedRevision = "R0";
-            nextRevision = "R30";
             stop = 0;
           } else if (item.revision.R30.checked === false) {
             activedRevision = "R30";
-            nextRevision = "R55";
             stop = 25000;
           } else if (item.revision.R55.checked === false) {
             activedRevision = "R55";
-            nextRevision = "R80";
             stop = 50000;
           } else if (item.revision.R80.checked === false) {
             activedRevision = "R80";
-            nextRevision = "R105";
             stop = 75000;
           } else if (item.revision.R105.checked === false) {
             activedRevision = "R105";
@@ -398,14 +390,7 @@ export const RowProvider = ({ children }) => {
         // FAZ O UPDATE NO BANCO DE DADOS
         //
         updatedData2.forEach((item) => {
-          ContadorServices.update(item._id, item)
-            .then((response) => {})
-            .catch((error) => {
-              console.error(
-                `Erro ao atualizar o item com ID ${item._id} no banco de dados:`,
-                error
-              );
-            });
+          useItemUpdater(item.id, item);
         });
 
         return updatedData2;
@@ -423,27 +408,27 @@ export const RowProvider = ({ children }) => {
   }
 
   const handleSelectChangeWrapper = (event, itemId) => {
-    handleSelectChange(event, itemId, setContador, ContadorServices);
+    handleSelectChange(event, itemId, setContador);
   };
 
   const handleDateChangeRevisionWrapper = (event, itemId) => {
-    handleDateChangeRevision(event, itemId, setContador, ContadorServices);
+    handleDateChangeRevision(event, itemId, setContador);
   };
 
   const handleDateChangeRevisionWrapper2 = (event, itemId) => {
-    handleDateChangeRevision2(event, itemId, setContador, ContadorServices);
+    handleDateChangeRevision2(event, itemId, setContador);
   };
 
   const handleInputChangeRevisionWrapper = (event, itemId) => {
-    handleInputChangeRevision(event, itemId, setContador, ContadorServices);
+    handleInputChangeRevision(event, itemId, setContador);
   };
 
   const handleSimpleSelectChangeWrapper = (event, itemId) => {
-    handleSimpleSelectChange(event, itemId, setContador, ContadorServices);
+    handleSimpleSelectChange(event, itemId, setContador);
   };
 
   const handleInputChangeWrapper = (event, itemId) => {
-    handleInputChange(event, itemId, setContador, ContadorServices);
+    handleInputChange(event, itemId, setContador);
   };
 
   const handleFilterChangeWrapper = (event) => {
@@ -459,7 +444,7 @@ export const RowProvider = ({ children }) => {
   };
 
   const handleDateChangeWrapper = (event, itemId) => {
-    return handleDateChange(event, itemId, setContador, ContadorServices);
+    return handleDateChange(event, itemId, setContador);
   };
 
   const handleCheckboxChangeWrapper = (event, itemId) => {
@@ -472,7 +457,7 @@ export const RowProvider = ({ children }) => {
   };
 
   const handleCheckboxChangeWrapper2 = (event, itemId) => {
-    return handleCheckboxChange2(event, itemId, setContador, ContadorServices);
+    return handleCheckboxChange2(event, itemId, setContador);
   };
 
   const handleChangeFilterWrapper = (event, checked, itemId) => {
@@ -484,7 +469,7 @@ export const RowProvider = ({ children }) => {
   };
 
   const oneYearFunctionWrapper = (c) => {
-    return oneYearFunction(c, setContador, ContadorServices);
+    return oneYearFunction(c, setContador);
   };
 
   const changeColorSelectWrapper = (value) => {
@@ -521,27 +506,21 @@ export const RowProvider = ({ children }) => {
         contador,
         fetchContador,
         habilitados2,
-        openAddTable,
-        openTimeRevision,
-        setOpenTimeRevision,
-        openDesableTable,
-        setOpenDesableTable,
-        setOpenAddTable,
         oneYearFunctionWrapper,
         changeColorCounterWrapper,
         changeColorSelectWrapper,
         searchFilterWrapper,
-        handleSimpleSelectChangeWrapper,
-        handleDateChangeRevisionWrapper,
-        handleDateChangeRevisionWrapper2,
-        handleCheckboxChangeWrapper,
-        handleCheckboxChangeWrapper2,
         handleFilterChangeWrapper,
-        handleInputChangeWrapper,
+        handleSimpleSelectChangeWrapper,
         handleSelectChangeWrapper,
         handleChangeFilterWrapper,
-        handleDateChangeWrapper,
+        handleCheckboxChangeWrapper,
+        handleCheckboxChangeWrapper2,
+        handleInputChangeWrapper,
         handleInputChangeRevisionWrapper,
+        handleDateChangeWrapper,
+        handleDateChangeRevisionWrapper,
+        handleDateChangeRevisionWrapper2,
       }}
     >
       {children}

@@ -1,6 +1,8 @@
 export default function searchFilter(pesquisa, padrao, setContador) {
   const termoLowerCase = pesquisa.toLowerCase();
 
+  console.log(termoLowerCase, "aquii");
+
   const filtrado = padrao.filter((item) => {
     return (
       item.table.toLowerCase().includes(termoLowerCase) ||

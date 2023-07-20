@@ -1,4 +1,6 @@
-export default function oneYearFunction(c, setContador, ContadorServices) {
+import useItemUpdater from "@/hooks/useItemUpdater";
+
+export default function oneYearFunction(c, setContador) {
   var date;
   var date1;
   var date2;
@@ -62,7 +64,6 @@ export default function oneYearFunction(c, setContador, ContadorServices) {
     date = c.revision.R80.date;
   }
 
-  console.log(date3, "date3");
   const dateRevision = new Date(date3);
   const nowDate = new Date();
   const variavel = nowDate - dateRevision;
@@ -81,20 +82,7 @@ export default function oneYearFunction(c, setContador, ContadorServices) {
     });
 
     updatedContador.forEach((item) => {
-      if (item._id === c._id) {
-        ContadorServices.update(item._id, item)
-          .then((response) => {
-            console.log(
-              `Item com ID ${item._id} atualizado com sucesso no banco de dados.`
-            );
-          })
-          .catch((error) => {
-            console.error(
-              `Erro ao atualizar o item com ID ${item._id} no banco de dados:`,
-              error
-            );
-          });
-      }
+      useItemUpdater(item.id, item);
     });
 
     return updatedContador;

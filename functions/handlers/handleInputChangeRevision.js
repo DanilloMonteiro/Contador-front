@@ -1,9 +1,6 @@
-export default function handleInputChangeRevision(
-  event,
-  itemId,
-  setContador,
-  ContadorServices
-) {
+import useItemUpdater from "@/hooks/useItemUpdater";
+
+export default function handleInputChangeRevision(event, itemId, setContador) {
   const { name, value } = event.target;
 
   console.log(value, "valueaqui");
@@ -28,20 +25,7 @@ export default function handleInputChangeRevision(
     });
 
     updatedContador.forEach((item) => {
-      if (item._id === itemId) {
-        ContadorServices.update(item._id, item)
-          .then((response) => {
-            console.log(
-              `Item com ID ${item._id} atualizado com sucesso no banco de dados.`
-            );
-          })
-          .catch((error) => {
-            console.error(
-              `Erro ao atualizar o item com ID ${item._id} no banco de dados:`,
-              error
-            );
-          });
-      }
+      useItemUpdater(itemId, item);
     });
 
     return updatedContador;

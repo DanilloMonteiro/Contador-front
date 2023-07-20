@@ -1,9 +1,6 @@
-export default function handleDateChangeRevision(
-  event,
-  itemId,
-  setContador,
-  ContadorServices
-) {
+import useItemUpdater from "@/hooks/useItemUpdater";
+
+export default function handleDateChangeRevision(event, itemId, setContador) {
   const { name, value } = event.target;
 
   let formattedValue = null;
@@ -42,7 +39,6 @@ export default function handleDateChangeRevision(
         console.log(item.revision[splited[1]].checked, "dentro 1 ");
 
         if (item.revision[splited[1]].checked === true) {
-          console.log("entrou 1 ");
           return {
             ...item,
             [splited[0]]: {
@@ -57,8 +53,6 @@ export default function handleDateChangeRevision(
             },
           };
         }
-
-        console.log("passou 1");
 
         const datetimeRegex = /^\d{4}-\d{2}-\d{2}$/;
         if (item._id === itemId && datetimeRegex.test(formattedValue)) {
@@ -126,7 +120,6 @@ export default function handleDateChangeRevision(
         console.log(item.revision[splited[1]].checked, "dentro 2 ");
 
         if (item.revision[splited[1]].checked === true) {
-          console.log("entrou 2 ");
           return {
             ...item,
             [splited[0]]: {
@@ -140,8 +133,6 @@ export default function handleDateChangeRevision(
             },
           };
         }
-
-        console.log("passou 2 ");
 
         const datetimeRegex = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -197,23 +188,8 @@ export default function handleDateChangeRevision(
       }
     });
 
-    console.log(updatedContador2, "aquiiiiiiiiiii");
-
     updatedContador2.forEach((item) => {
-      if (item._id === itemId) {
-        ContadorServices.update(item._id, item)
-          .then((response) => {
-            console.log(
-              `Item com ID ${item._id} atualizado com sucesso no banco de dados com a data ${item.revision.R0.date}.`
-            );
-          })
-          .catch((error) => {
-            console.error(
-              `Erro ao atualizar o item com ID ${item._id} no banco de dados:`,
-              error
-            );
-          });
-      }
+      useItemUpdater(itemId, item);
     });
 
     return updatedContador2;

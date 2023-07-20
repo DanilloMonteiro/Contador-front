@@ -6,7 +6,6 @@ export default function Table({}) {
   return (
     <div className="flex justify-center">
       <div
-        className=""
         style={{
           display: "flex",
           height: "80vh",

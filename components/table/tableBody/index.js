@@ -1,5 +1,6 @@
 import { RowContext } from "@/context/RowContext";
 import { useContext } from "react";
+import TdDefault from "./tdDefault";
 
 export default function TBody() {
   const {
@@ -23,41 +24,13 @@ export default function TBody() {
         <tr
           key={c._id}
           className={`${
-            c.digital_table === false ? "bg-orange-200" : "bg-white"
+            c.digital_table === false ? "bg-gray-200" : "bg-white"
           }`}
         >
-          <td className="border border-slate-400 h-[35px]">
-            <input
-              className={`w-full px-3 text-black py-1 text-center`}
-              value={c.table}
-              name="table"
-              readOnly
-            ></input>
-          </td>
-          <td className="border border-slate-400 ...">
-            <input
-              className={`w-full px-3 py-1 text-center`}
-              value={c.line}
-              name="line"
-              readOnly
-            ></input>
-          </td>
-          <td className="border border-slate-400 ...">
-            <input
-              className={`w-full px-3 py-1 text-center`}
-              value={c.customer}
-              name="customer"
-              readOnly
-            ></input>
-          </td>
-          <td className="border border-slate-400 ...">
-            <input
-              className={`w-full px-3 py-1 text-center`}
-              value={c.fluig_number}
-              name="fluig_number"
-              readOnly
-            ></input>
-          </td>
+          <TdDefault value={c.table} name={"table"} readOnly />
+          <TdDefault value={c.line} name={"line"} readOnly />
+          <TdDefault value={c.customer} name={"customer"} readOnly />
+          <TdDefault value={c.fluig_number} name={"fluig_number"} readOnly />
           <td className="border border-slate-400 ">
             <input
               className={`w-full px-3 py-1 text-center
@@ -174,22 +147,12 @@ export default function TBody() {
               type="date"
             ></input>
           </td>
-          <td className="border border-slate-400 ...">
-            <input
-              className={`w-full px-3 py-1 text-center`}
-              value={c.observation}
-              onChange={(event) => handleInputChangeWrapper(event, c._id)}
-              name="observation"
-            ></input>
-          </td>
-          <td className="border border-slate-400 ...">
-            <input
-              className={`w-full px-3 py-1 text-center`}
-              value={c.team}
-              name="team"
-              readOnly
-            ></input>
-          </td>
+          <TdDefault
+            value={c.observation}
+            onChange={(event) => handleInputChangeWrapper(event, c._id)}
+            name="observation"
+          />
+          <TdDefault value={c.team} name="team" readOnly />
           <td className="relative border border-slate-400 ...">
             <div className="flex flex-row">
               <input

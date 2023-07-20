@@ -1,12 +1,7 @@
-export default function handleCheckboxChange(
-  event,
-  itemId,
-  setDesabilitadas,
-  ContadorServices
-) {
-  const { name, checked } = event.target;
+import useItemUpdater from "@/hooks/useItemUpdater";
 
-  console.log(name, checked, "a111111");
+export default function handleCheckboxChange(event, itemId, setDesabilitadas) {
+  const { name, checked } = event.target;
 
   setDesabilitadas((prevContador) => {
     const updatedContador = prevContador.map((item) => {
@@ -19,23 +14,8 @@ export default function handleCheckboxChange(
       return item;
     });
 
-    console.log(updatedContador, "aqui222");
-
     updatedContador.forEach((item) => {
-      if (item._id === itemId) {
-        ContadorServices.update(item._id, item)
-          .then((response) => {
-            console.log(
-              `Item com ID ${item._id} atualizado com sucesso no banco de dados.`
-            );
-          })
-          .catch((error) => {
-            console.error(
-              `Erro ao atualizar o item com ID ${item._id} no banco de dados:`,
-              error
-            );
-          });
-      }
+      useItemUpdater(itemId, item);
     });
 
     return updatedContador;
