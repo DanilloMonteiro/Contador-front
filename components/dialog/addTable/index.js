@@ -2,6 +2,7 @@ import { RowContext } from "@/context/RowContext";
 import { useContext, useState } from "react";
 
 import ContadorServices from "@/services/contador";
+import { X } from "@phosphor-icons/react";
 
 export default function DialogAddTable({ isOpen, setIsOpen }) {
   const { fetchContador } = useContext(RowContext);
@@ -62,15 +63,26 @@ export default function DialogAddTable({ isOpen, setIsOpen }) {
         <div className="fixed opacity-40 bg-gray-300 w-full h-full"></div>
       )}
       {isOpen && (
-        <div className="fixed top-0 bg-blue-300 w-1/2 h-[90vh] mt-[3vh] drop-shadow-xl">
+        <div className="flex fixed bg-white w-1/2 h-[90vh] mt-[3vh] drop-shadow-xl z-10">
           <div className="flex flex-col w-full h-full">
-            <p className="text-start text-blue-400 text-4xl bg-white p-3 w-full">
-              Adicinar uma nova mesa
-            </p>
-            <div className="flex flex-col bg-blue-300 w-full h-full">
-              <form className="flex flex-col p-2 flex-grow w-full h-full">
-                <h2 className="text-3xl mb-5 mx-5">Dados da mesa</h2>
-                <div className="flex flex-col gap-5 mx-10">
+            <div className="flex flex-row ">
+              <p className="text-star font-rubik text-white text-2xl bg-blue-500 px-3 pt-2  w-full">
+                Notificações
+              </p>
+              <button
+                className="bg-blue-500 border-2 border-blue-500 text-white px-3 py-1 hover:bg-white hover:text-blue-500"
+                onClick={() => {
+                  setIsOpen(false);
+                  fetchContador();
+                }}
+              >
+                <X size={32} weight="bold" />
+              </button>
+            </div>
+            <div className="flex flex-col bg-white w-full h-full">
+              <form className="flex flex-col flex-grow h-full bg-slate-200 m-5 p-5">
+                <h2 className="text-3xl ">Dados da mesa</h2>
+                <div className="flex flex-col gap-5 mt-6">
                   <div className="flex flex-row justify-between w-full">
                     <label className="text-xl">Número da mesa: </label>
                     <input
@@ -140,23 +152,23 @@ export default function DialogAddTable({ isOpen, setIsOpen }) {
                     </div>
                   </div>
                 </div>
+                <div className="flex justify-between mt-auto">
+                  <button
+                    className="bg-red-500 px-4 py-2 hover:bg-white text-white hover:text-red-500 rounded-sm border-2 border-red-500"
+                    onClick={() => {
+                      setIsOpen(false);
+                    }}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    className="bg-blue-500 px-4 py-2 hover:bg-white text-white hover:text-blue-500 rounded-sm border-2 border-blue-500"
+                    onClick={handleConfirm}
+                  >
+                    Confirmar
+                  </button>
+                </div>
               </form>
-              <div className="flex justify-between m-10">
-                <button
-                  className="bg-blue-200 px-4 py-2 hover:bg-blue-300"
-                  onClick={() => {
-                    setIsOpen(false);
-                  }}
-                >
-                  Cancelar
-                </button>
-                <button
-                  className="bg-blue-200 px-4 py-2 hover:bg-blue-300"
-                  onClick={handleConfirm}
-                >
-                  Confirmar
-                </button>
-              </div>
             </div>
           </div>
         </div>

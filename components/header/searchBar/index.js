@@ -7,13 +7,15 @@ import SearchInput from "./searchInput";
 
 import { RowContext } from "@/context/RowContext";
 import { useContext, useState } from "react";
+import DialogNotification from "@/components/dialog/notifications";
 
 export default function SearchBar() {
-  const { fetchContador } = useContext(RowContext);
+  const { fetchContador, notifications } = useContext(RowContext);
 
   const [isOpenAddTable, setIsOpenAddTable] = useState(false);
   const [isOpenTimeRevision, setIsOpenTimeRevision] = useState(false);
   const [isOpenDisableTable, setIsOpenDisableTable] = useState(false);
+  const [isOpenNotification, setIsOpenNotification] = useState(false);
 
   return (
     <>
@@ -22,6 +24,14 @@ export default function SearchBar() {
         <div className="flex flex-wrap justify-center align-center ml-auto ">
           <StatusPoints />
           <div className="flex gap-4">
+            <Button
+              onClick={() => {
+                setIsOpenNotification(true);
+                fetchContador();
+              }}
+              length={notifications.length}
+              bell
+            />
             <Button
               onClick={() => {
                 setIsOpenDisableTable(true);
@@ -52,6 +62,10 @@ export default function SearchBar() {
       <DialogDisableTable
         isOpen={isOpenDisableTable}
         setIsOpen={setIsOpenDisableTable}
+      />
+      <DialogNotification
+        isOpen={isOpenNotification}
+        setIsOpen={setIsOpenNotification}
       />
     </>
   );

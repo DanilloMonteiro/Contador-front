@@ -16,11 +16,13 @@ import handleCheckboxChange2 from "@/functions/handlers/handleCheckboxChange";
 import oneYearFunction from "@/functions/filters/oneYearFunction";
 import handleDateChangeRevision2 from "@/functions/handlers/dataChange/revision/handleDateChangeRevision2";
 import useItemUpdater from "@/hooks/useItemUpdater";
+import NotificationServices from "@/services/notification";
 
 export const RowContext = createContext();
 
 export const RowProvider = ({ children }) => {
   const [contador, setContador] = useState([]);
+  const [notifications, setNotifications] = useState([]);
 
   const [camposAmarelos, setCamposAmarelos] = useState([]);
   const [camposVermelhos, setCamposVermelhos] = useState([]);
@@ -36,6 +38,8 @@ export const RowProvider = ({ children }) => {
 
   async function fetchContador() {
     const response = await ContadorServices.index();
+    const response2 = await NotificationServices.index();
+    setNotifications(response2.data);
 
     const desabilitados = response.data.filter((c) => c.desabled === true);
     const habilitados = response.data.filter((c) => c.desabled === false);
@@ -68,20 +72,27 @@ export const RowProvider = ({ children }) => {
           oneYearFunctionWrapper(item);
           let activedRevision;
           let stop;
+          let stop_table;
           let days30 = 30;
           if (item.revision.R0.checked === false) {
             activedRevision = "R0";
+            stop_table = 0;
             stop = 0;
           } else if (item.revision.R30.checked === false) {
             activedRevision = "R30";
+
+            stop_table = 30000;
             stop = 25000;
           } else if (item.revision.R55.checked === false) {
             activedRevision = "R55";
+            stop_table = 55000;
             stop = 50000;
           } else if (item.revision.R80.checked === false) {
             activedRevision = "R80";
+            stop_table = 80000;
             stop = 75000;
           } else if (item.revision.R105.checked === false) {
+            stop_table = 105000;
             activedRevision = "R105";
           } else {
             null;
@@ -139,6 +150,7 @@ export const RowProvider = ({ children }) => {
 
             return {
               ...item,
+              stop_table: stop_table,
               revision: {
                 ...item.revision,
                 R0: {
@@ -165,6 +177,7 @@ export const RowProvider = ({ children }) => {
           ) {
             return {
               ...item,
+              stop_table: stop_table,
               revision: {
                 ...item.revision,
                 R0: {
@@ -195,6 +208,7 @@ export const RowProvider = ({ children }) => {
 
             return {
               ...item,
+              stop_table: stop_table,
               revision: {
                 ...item.revision,
                 R0: {
@@ -390,7 +404,7 @@ export const RowProvider = ({ children }) => {
         // FAZ O UPDATE NO BANCO DE DADOS
         //
         updatedData2.forEach((item) => {
-          useItemUpdater(item.id, item);
+          useItemUpdater(item._id, item);
         });
 
         return updatedData2;
@@ -496,6 +510,7 @@ export const RowProvider = ({ children }) => {
   return (
     <RowContext.Provider
       value={{
+        notifications,
         isFilterActive1,
         setFilterActive1,
         camposAmarelos,
