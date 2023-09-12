@@ -4,6 +4,7 @@ import DialogTimeRevision from "@/components/dialog/timeRevision";
 import StatusPoints from "./statuspoints";
 import Button from "@/components/button";
 import SearchInput from "./searchInput";
+import axios from "axios";
 
 import { RowContext } from "@/context/RowContext";
 import { useContext, useState } from "react";
@@ -16,6 +17,15 @@ export default function SearchBar() {
   const [isOpenTimeRevision, setIsOpenTimeRevision] = useState(false);
   const [isOpenDisableTable, setIsOpenDisableTable] = useState(false);
   const [isOpenNotification, setIsOpenNotification] = useState(false);
+
+  // const enviarComandoSerial = async (comando) => {
+  //   try {
+  //     await axios.post("/enviar-comando-serial", { comando });
+  //     console.log("Comando enviado: " + comando);
+  //   } catch (error) {
+  //     console.error("Erro ao enviar comando serial:", error);
+  //   }
+  // };
 
   return (
     <>

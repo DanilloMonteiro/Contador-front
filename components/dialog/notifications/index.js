@@ -5,6 +5,21 @@ import { useContext } from "react";
 
 export default function DialogNotification({ isOpen, setIsOpen }) {
   const { fetchContador, notifications } = useContext(RowContext);
+
+  const handleDeleteNotification = async (notificationId) => {
+    try {
+      await NotificationServices.delete(notificationId);
+      fetchContador();
+    } catch (error) {
+      console.error("Erro ao excluir notificação:", error);
+    }
+  };
+
+  const handleCloseNotifications = () => {
+    setIsOpen(false);
+    fetchContador();
+  };
+
   return (
     <>
       {isOpen && (
@@ -19,10 +34,7 @@ export default function DialogNotification({ isOpen, setIsOpen }) {
               </p>
               <button
                 className="bg-blue-500 border-2 border-blue-500 text-white px-3 py-1 hover:bg-white hover:text-blue-500"
-                onClick={() => {
-                  setIsOpen(false);
-                  fetchContador();
-                }}
+                onClick={() => handleCloseNotifications()}
               >
                 <X size={32} weight="bold" />
               </button>
@@ -38,10 +50,7 @@ export default function DialogNotification({ isOpen, setIsOpen }) {
                     </span>
                     <button
                       className="text-red-500 px-4 ml-auto hover:text-red-800"
-                      onClick={() => {
-                        NotificationServices.delete(notification._id);
-                        fetchContador();
-                      }}
+                      onClick={() => handleDeleteNotification(notification._id)}
                     >
                       <X size={22} weight="bold" />
                     </button>

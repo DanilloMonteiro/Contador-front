@@ -41,8 +41,8 @@ export const RowProvider = ({ children }) => {
     const response2 = await NotificationServices.index();
     setNotifications(response2.data);
 
-    const desabilitados = response.data.filter((c) => c.desabled === true);
-    const habilitados = response.data.filter((c) => c.desabled === false);
+    const desabilitados = response.data.filter((c) => c.disabled === true);
+    const habilitados = response.data.filter((c) => c.disabled === false);
 
     setHabilitados(habilitados);
     setDesabilitadas(desabilitados);

@@ -4,7 +4,7 @@ export default function Button({ onClick, name, arrowReload, bell, length }) {
   return (
     <>
       <button
-        className="flex flex-row relative bg-white w-auto h-auto px-3 py-[2px] border-[2px] rounded-sm text-blue-600 font-semibold hover:bg-blue-500 hover:text-white border-blue-600"
+        className="flex flex-row relative bg-white w-auto h-auto px-3 py-[2px] border-[2px] rounded-sm text-blue-600 font-semibold hover:bg-blue-500 hover:text-white border-blue-600 active:bg-white active:text-blue-600"
         onClick={onClick}
       >
         {name}

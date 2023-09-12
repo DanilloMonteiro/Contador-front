@@ -89,6 +89,9 @@ export default function SecondTH() {
       <th className="border border-slate-400 min-w-[100px] bg-green-300  ">
         R
       </th>
+      <th className="border border-slate-400 min-w-[100px] bg-gray-200  ">
+        Mac
+      </th>
     </tr>
   );
 }

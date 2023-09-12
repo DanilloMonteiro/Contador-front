@@ -54,8 +54,8 @@ export default function TBody() {
             <input
               className={`w-full px-3 py-0 text-center`}
               value={
-                c.last_count_number
-                  ? new Date(c.last_count_number).toISOString().split("T")[0]
+                c.last_count_date
+                  ? new Date(c.last_count_date).toISOString().split("T")[0]
                   : ""
               }
               readOnly
@@ -66,19 +66,19 @@ export default function TBody() {
             <select
               className={`w-full h-[30px] text-center
                 ${
-                  changeColorSelectWrapper(c.counter) === "green"
+                  changeColorSelectWrapper(c.has_counter) === "green"
                     ? "bg-green-300"
                     : ""
                 }
                 ${
-                  changeColorSelectWrapper(c.counter) === "red"
+                  changeColorSelectWrapper(c.has_counter) === "red"
                     ? "bg-red-300"
                     : ""
                 }
                 `}
-              value={c.counter ? "sim" : "nao"}
+              value={c.has_counter ? "sim" : "nao"}
               onChange={(event) => handleSelectChangeWrapper(event, c._id)}
-              name="counter"
+              name="has_counter"
             >
               <option value="sim">Sim</option>
               <option value="nao">Não</option>
@@ -435,6 +435,12 @@ export default function TBody() {
               )}
             </div>
           </td>
+          <TdDefault
+            value={c.board.mac}
+            name="map_esp32"
+            readOnly
+            onChange={(event) => handleInputChangeWrapper(event, c._id)}
+          />
         </tr>
       ))}
     </tbody>

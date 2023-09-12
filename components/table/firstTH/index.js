@@ -43,6 +43,12 @@ export default function FirstTR() {
       >
         Revisão por tempo
       </th>
+      <th
+        className="border border-slate-500 min-w-[200px] bg-gray-400"
+        colSpan={1}
+      >
+        Mac
+      </th>
     </tr>
   );
 }
