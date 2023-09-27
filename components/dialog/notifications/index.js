@@ -4,12 +4,13 @@ import { X } from "@phosphor-icons/react";
 import { useContext } from "react";
 
 export default function DialogNotification({ isOpen, setIsOpen }) {
-  const { fetchContador, notifications } = useContext(RowContext);
+  const { fetchRow, fetchNotifications, notifications } =
+    useContext(RowContext);
 
   const handleDeleteNotification = async (notificationId) => {
     try {
       await NotificationServices.delete(notificationId);
-      fetchContador();
+      fetchNotifications();
     } catch (error) {
       console.error("Erro ao excluir notificação:", error);
     }
@@ -17,7 +18,7 @@ export default function DialogNotification({ isOpen, setIsOpen }) {
 
   const handleCloseNotifications = () => {
     setIsOpen(false);
-    fetchContador();
+    fetchRow(100);
   };
 
   return (
@@ -33,13 +34,13 @@ export default function DialogNotification({ isOpen, setIsOpen }) {
                 Notificações
               </p>
               <button
-                className="bg-blue-500 border-2 border-blue-500 text-white px-3 py-1 hover:bg-white hover:text-blue-500"
+                className="bg-blue-500 border-2 border-blue-500 text-white px-3 py-1 hover:bg-white transition-colors duration-500 hover:text-blue-500"
                 onClick={() => handleCloseNotifications()}
               >
                 <X size={32} weight="bold" />
               </button>
             </div>
-            <div className="flex relative flex-col font-rubik max-h-[800px] gap-4 overflow-auto mx-7 my-4 ">
+            <div className="flex relative flex-col font-rubik max-h-[800px] gap-4 overflow-auto mx-5 my-4 pr-2">
               {notifications.map((notification) => (
                 <div className="flex flex-col w-full h-auto bg-slate-100 py-3 pl-3">
                   <div className="flex items-center">
@@ -61,6 +62,24 @@ export default function DialogNotification({ isOpen, setIsOpen }) {
                   </span>
                 </div>
               ))}
+            </div>
+            <div className="flex w-full h-auto mt-auto p-5">
+              <button
+                onClick={() => {
+                  closePage();
+                }}
+                className="flex flex-row relative bg-white w-auto h-auto px-3 py-[2px] mt-3 border-[2px] rounded-sm text-blue-600 font-semibold hover:bg-blue-500 hover:text-white border-blue-600"
+              >
+                Voltar
+              </button>
+              <button
+                className="flex flex-row relative bg-blue-500 ml-auto w-auto h-auto px-3 py-[2px] mt-3 border-[2px] rounded-sm text-white font-semibold hover:bg-white hover:text-blue-600 border-blue-600 active:bg-blue-500 active:text-white"
+                onClick={(e) => {
+                  clearFields();
+                }}
+              >
+                Excluir todas
+              </button>
             </div>
           </div>
         </div>

@@ -1,4 +1,12 @@
+import { RowContext } from "@/context/RowContext";
+import { Fragment, useContext } from "react";
+
 export default function FirstTR() {
+  const { data } = useContext(RowContext);
+
+  const revisions = data ? data[0]?.revision : [];
+  const revisions_time = data ? data[0]?.revision_time : [];
+
   return (
     <tr>
       <th
@@ -8,28 +16,10 @@ export default function FirstTR() {
         Planejamento Preventiva
       </th>
       <th
-        className="border border-slate-500 min-w-[100px] bg-gray-400"
-        colSpan={2}
+        className="border border-slate-500 min-w-[200px] bg-gray-400"
+        colSpan={1}
       >
-        0
-      </th>
-      <th
-        className="border border-slate-500 min-w-[100px] bg-gray-400"
-        colSpan={2}
-      >
-        30000
-      </th>
-      <th
-        className="border border-slate-500 min-w-[100px] bg-gray-400"
-        colSpan={2}
-      >
-        55000
-      </th>
-      <th
-        className="border border-slate-500 min-w-[100px] bg-gray-400"
-        colSpan={2}
-      >
-        80000
+        Mac
       </th>
       <th
         className="border border-slate-500 min-w-[100px] bg-gray-400"
@@ -37,18 +27,27 @@ export default function FirstTR() {
       >
         Desabilitada
       </th>
-      <th
-        className="border border-slate-500 min-w-[200px] bg-gray-400"
-        colSpan={6}
-      >
-        Revisão por tempo
-      </th>
-      <th
-        className="border border-slate-500 min-w-[200px] bg-gray-400"
-        colSpan={1}
-      >
-        Mac
-      </th>
+      {revisions?.map((rev) => (
+        <Fragment key={rev._id}>
+          <th
+            className="border border-slate-500 min-w-[100px] bg-gray-400"
+            colSpan={2}
+          >
+            {rev.stop}
+          </th>
+        </Fragment>
+      ))}
+
+      {revisions_time?.map((rev) => (
+        <Fragment key={rev._id}>
+          <th
+            className="border border-slate-500 min-w-[100px] bg-gray-400"
+            colSpan={2}
+          >
+            {rev.code}
+          </th>
+        </Fragment>
+      ))}
     </tr>
   );
 }

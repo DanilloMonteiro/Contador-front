@@ -3,7 +3,7 @@ import { X } from "@phosphor-icons/react";
 import { useContext } from "react";
 
 export default function DialogTimeRevision({ isOpen, setIsOpen }) {
-  const { contador, changeColorCounterWrapper, fetchContador } =
+  const { contador, changeColorCounterWrapper, fetchRow } =
     useContext(RowContext);
   return (
     <>
@@ -21,7 +21,7 @@ export default function DialogTimeRevision({ isOpen, setIsOpen }) {
                 className="bg-blue-500 border-2 border-blue-500 text-white px-3 py-1 hover:bg-white hover:text-blue-500"
                 onClick={() => {
                   setIsOpen(false);
-                  fetchContador();
+                  fetchRow(100);
                 }}
               >
                 <X size={32} weight="bold" />
@@ -34,7 +34,7 @@ export default function DialogTimeRevision({ isOpen, setIsOpen }) {
                   border 
                   border-slate-400
                   w-[90%]
-                  bg-white"
+                  bg-slate-100 "
               >
                 <thead>
                   <tr>

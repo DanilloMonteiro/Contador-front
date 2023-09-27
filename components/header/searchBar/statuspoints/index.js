@@ -1,28 +1,47 @@
 import { RowContext } from "@/context/RowContext";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 
 export default function StatusPoints() {
-  const { camposAmarelos, camposVermelhos, habilitados2 } =
-    useContext(RowContext);
+  const { queryData, fetchRow } = useContext(RowContext);
 
-  const restante = camposAmarelos.length + camposVermelhos.length;
+  const [redQuantity, setRedQuantity] = useState([]);
+  const [yellowQuantity, setYellowQuantity] = useState([]);
+  const [greenQuantity, setGreenQuantity] = useState([]);
 
-  const camposVerdes = habilitados2.length - restante;
+  function quantityStatus() {
+    const redItems = queryData.filter((item) => item.count_status === "red");
+    const yellowItems = queryData.filter(
+      (item) => item.count_status === "yellow"
+    );
+    const greenItems = queryData.filter(
+      (item) => item.count_status === "green"
+    );
+
+    setRedQuantity(redItems);
+    setGreenQuantity(greenItems);
+    setYellowQuantity(yellowItems);
+
+    console.log(redQuantity, greenQuantity, yellowQuantity, "items");
+  }
+
+  useEffect(() => {
+    quantityStatus();
+  }, [fetchRow]);
 
   return (
     <>
       <div className="flex gap-5 mr-8">
         <div className="flex gap-2">
           <div className="mt-[9px] w-[10px] h-[10px] rounded-full bg-green-500"></div>
-          <h4 className="text-lg">{camposVerdes}</h4>
+          <h4 className="text-lg">{greenQuantity?.length}</h4>
         </div>
         <div className="flex gap-2">
           <div className="mt-[9px] w-[10px] h-[10px] rounded-full bg-yellow-500"></div>
-          <h4 className="text-lg">{camposAmarelos.length}</h4>
+          <h4 className="text-lg">{yellowQuantity?.length}</h4>
         </div>
         <div className="flex gap-2">
           <div className="mt-[9px] w-[10px] h-[10px] rounded-full bg-red-500"></div>
-          <h4 className="text-lg">{camposVermelhos.length}</h4>
+          <h4 className="text-lg">{redQuantity?.length}</h4>
         </div>
       </div>
     </>

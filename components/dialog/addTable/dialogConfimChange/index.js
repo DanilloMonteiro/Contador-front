@@ -1,12 +1,10 @@
 import { BoardContext } from "@/context/BoardContext";
-import { RowContext } from "@/context/RowContext";
 import BoardServices from "@/services/board";
 import ContadorServices from "@/services/contador";
-import { MagnifyingGlass, Swap } from "@phosphor-icons/react";
 import { useContext, useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function DialogConfirmChange() {
-  const { fetchContador } = useContext(RowContext);
   const {
     isOpenConfirmChange,
     setIsOpenChangeRow,
@@ -14,55 +12,86 @@ export default function DialogConfirmChange() {
     setIsOpenConfirmChange,
     actualBoardId,
     actualBoardMac,
-    setActualTableMac,
     actualTableMac,
+    actualTable,
+    setIsOpenChangeRowMec,
+    setIsOpenCreateRow,
+    setIsOpenMenu,
   } = useContext(BoardContext);
-
-  const [foundTable, setFoundTable] = useState(null);
-
-  const [table, setTable] = useState("");
-  const [line, setLine] = useState("");
-  const [customer, setCustomer] = useState("");
-  const [fluigNumber, setFluigNumber] = useState("");
-  const [team, setTeam] = useState("");
 
   const [newMacCode, setNewMacCode] = useState("");
 
   const [selectedInput, setSelectedInput] = useState(false);
   const [differentInput, setDifferentInput] = useState(false);
 
-  const handleSearch = async () => {
+  const handleCofirm = async (e) => {
+    e.preventDefault();
+
+    let successRow = false;
+    let successBoard = false;
+
+    var changedTable;
     try {
       // Realize a pesquisa da mesa com base no número fornecido
-      console.log(table);
-      const mesaEncontrada = await ContadorServices.find(table);
 
-      console.log("aqui");
-      console.log(mesaEncontrada);
+      changedTable = actualTable.data;
+      changedTable.board = actualBoardId;
 
-      if (mesaEncontrada) {
-        // Preencha os campos com os dados da mesa encontrada
-        setFoundTable(mesaEncontrada.data);
-        setTable(mesaEncontrada.data.table);
-        setLine(mesaEncontrada.data.line);
-        setCustomer(mesaEncontrada.data.customer);
-        setFluigNumber(mesaEncontrada.data.fluig_number);
-        setTeam(mesaEncontrada.data.team);
-        setActualTableMac(mesaEncontrada.data.board.mac);
-      } else {
-        // Mesa não encontrada, limpe os campos
-        console.log("entrou no else");
-        setFoundTable(null);
-        setTable("");
-        setLine("");
-        setCustomer("");
-        setFluigNumber("");
-        setTeam("");
-        setActualTableMac("");
-      }
+      console.log(changedTable, "aqui id");
+
+      await ContadorServices.update(changedTable._id, changedTable)
+        .then((response) => {
+          successRow = true;
+          console.log("Atualizacao de item no MongoDB feita com sucesso");
+        })
+        .catch((error) => {
+          console.error(`Erro ao atualizar o item no banco de dados:`, error);
+        });
+
+      const updatedBoard = {
+        row: changedTable._id,
+      };
+
+      await BoardServices.update(actualBoardId, updatedBoard)
+        .then((response) => {
+          successBoard = true;
+          backToTable();
+          console.log("Atualizacao de item no MongoDB feita com sucesso");
+        })
+        .catch((error) => {
+          console.error(`Erro ao atualizar o item no banco de dados:`, error);
+        });
     } catch (error) {
       console.error("Erro ao pesquisar mesa:", error);
     }
+
+    if (successBoard == true && successRow == true) {
+      console.log("aqui");
+      toast.success("Tudo certo! Mac modificado com sucesso!");
+    } else if (successBoard == false && successRow == true) {
+      toast.error(
+        "Erro ao salvar placa! Tente novamente ou contate o Administador",
+        {
+          duration: 4000,
+        }
+      );
+    } else if (successBoard == true && successRow == false) {
+      toast.error(
+        "Erro ao salvar a mesa! Tente novamente ou contate o Administador",
+        {
+          duration: 4000,
+        }
+      );
+    } else {
+      toast.error(
+        "Essa ação nao pode ser concluida! Tente novamente ou contate o Administador",
+        {
+          duration: 4000,
+        }
+      );
+    }
+    setSelectedInput(false);
+    setDifferentInput(false);
   };
 
   function selectedBoard(e) {
@@ -74,6 +103,18 @@ export default function DialogConfirmChange() {
     console.log(selectedInput);
   }
 
+  function backToTable() {
+    setIsOpenMenu(true);
+    setIsOpenChangeRowMec(false);
+    setIsOpenCreateRow(false);
+    setIsOpenChangeRow(false);
+    setIsOpenPendingBoard(false);
+    setIsOpenConfirmChange(false);
+    setSelectedInput(false);
+    setDifferentInput(false);
+    setIsOpen(false);
+  }
+
   function differentBoard(e) {
     e.preventDefault();
 
@@ -83,9 +124,10 @@ export default function DialogConfirmChange() {
     console.log(selectedInput);
   }
 
-  function openConfirmChange() {
-    setIsOpenChangeRow(true);
+  function backToPendingBoards() {
     setIsOpenConfirmChange(false);
+    setIsOpenChangeRow(false);
+    setIsOpenPendingBoard(true);
   }
 
   function lastPage(e) {
@@ -104,7 +146,7 @@ export default function DialogConfirmChange() {
             <div className="flex flex-col justify-start w-full h-full gap-5 mt-6 mr-4">
               <div className="flex flex-row justify-between w-full h-auto gap-5">
                 <label className="flex flex-nowrap text-xl text-right w-auto h-auto">
-                  Código MAC atual:
+                  Código MAC atual da mesa:
                 </label>
                 <input
                   className="flex flex-grow w-auto h-auto bg-slate-200 px-2"
@@ -156,7 +198,9 @@ export default function DialogConfirmChange() {
                       className="flex flex-grow w-auto h-auto bg-slate-200 px-2"
                       type="text"
                       value={actualBoardMac}
-                      onChange={() => {}}
+                      onChange={(e) => {
+                        e.target.value;
+                      }}
                     />
                   </div>
                   <div className="bg-slate-200 p-2 pb-6">
@@ -216,7 +260,9 @@ export default function DialogConfirmChange() {
               </button>
               <button
                 className="flex flex-row relative bg-blue-500 w-auto h-auto px-3 py-[2px] mt-3 border-[2px] rounded-sm text-white font-semibold hover:bg-white hover:text-blue-600 border-blue-600 active:bg-blue-500 active:text-white"
-                onClick={() => {}}
+                onClick={(e) => {
+                  handleCofirm(e);
+                }}
               >
                 Confirmar
               </button>

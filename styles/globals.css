@@ -14,3 +14,25 @@ head {
   max-height: 100px; /* Defina o limite de altura desejado */
   overflow: auto; /* Adicione uma barra de rolagem caso o conteúdo exceda o limite de altura */
 }
+
+/* ===== Scrollbar CSS ===== */
+/* Firefox */
+* {
+  scrollbar-width: auto;
+  scrollbar-color: #3b82f6 #ffffff;
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 16px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #ffffff;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #3b82f6;
+  border-radius: 10px;
+  border: 3px solid #ffffff;
+}

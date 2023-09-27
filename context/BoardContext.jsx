@@ -11,11 +11,13 @@ export const BoardProvider = ({ children }) => {
   const [isOpenCreateRow, setIsOpenCreateRow] = useState(false);
   const [isOpenChangeRow, setIsOpenChangeRow] = useState(false);
   const [isOpenConfirmChange, setIsOpenConfirmChange] = useState(false);
+  const [isOpenChangeRowMec, setIsOpenChangeRowMec] = useState(false);
 
   const [actualBoardId, setActualBoardId] = useState("");
   const [actualBoardMac, setActualBoardMac] = useState("");
 
   const [actualTableMac, setActualTableMac] = useState("");
+  const [actualTable, setActualTable] = useState("");
 
   async function fetchBoard() {
     const response = await BoardServices.index();
@@ -25,7 +27,6 @@ export const BoardProvider = ({ children }) => {
       setBoards(response.data);
     } else {
       setBoards([]);
-      console.log("nao tem nenhuma placa");
     }
   }
 
@@ -53,6 +54,10 @@ export const BoardProvider = ({ children }) => {
         setIsOpenConfirmChange,
         actualTableMac,
         setActualTableMac,
+        actualTable,
+        setActualTable,
+        isOpenChangeRowMec,
+        setIsOpenChangeRowMec,
       }}
     >
       {children}

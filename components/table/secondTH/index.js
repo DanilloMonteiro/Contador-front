@@ -1,8 +1,12 @@
 import { RowContext } from "@/context/RowContext";
-import { useContext } from "react";
+import { Fragment, useContext } from "react";
 
 export default function SecondTH() {
-  const { handleFilterChangeWrapper } = useContext(RowContext);
+  const { data } = useContext(RowContext);
+
+  const revisions = data ? data[0]?.revision : [];
+  const revisions_time = data ? data[0]?.revision_time : [];
+
   return (
     <tr>
       <th
@@ -20,28 +24,11 @@ export default function SecondTH() {
       <th className="border border-slate-400 min-w-[100px] bg-gray-300">
         Nº FLUIG
       </th>
-      <th className=" flex flex-col items-center border border-slate-400 min-w-[200px] bg-gray-300">
-        <h1 className="p-1">Número de ciclos</h1>
-        <div className="flex flex-row">
-          <select
-            className="w-[70px] h-[30px] m-2"
-            onChange={handleFilterChangeWrapper}
-          >
-            <option value="all">Todos</option>
-            <option value="yellow">Amarelo</option>
-            <option value="red">Vermelho</option>
-          </select>
-          <select
-            className="w-[70px] h-[30px] m-2"
-            onChange={handleFilterChangeWrapper}
-          >
-            <option value="maior">Maior</option>
-            <option value="menor">Menor</option>
-          </select>
-        </div>
+      <th className=" border border-slate-400 min-w-[200px] bg-gray-300">
+        Número de ciclos
       </th>
-      <th className="border border-slate-400 min-w-[100px] bg-gray-300">
-        Contador?
+      <th className=" border border-slate-400 min-w-[150px] bg-gray-300">
+        Dias para revisão por tempo
       </th>
       <th className="border border-slate-400 min-w-[100px] bg-gray-300">
         Mesa digital?
@@ -58,40 +45,32 @@ export default function SecondTH() {
       <th className="border border-slate-400 min-w-[100px] bg-gray-300">
         Equipe
       </th>
-      <th className="border border-slate-400 min-w-[100px] bg-blue-300  ">P</th>
-      <th className="border border-slate-400 min-w-[100px] bg-green-300  ">
-        R
-      </th>
-      <th className="border border-slate-400 min-w-[100px] bg-blue-300  ">P</th>
-      <th className="border border-slate-400 min-w-[100px] bg-green-300  ">
-        R
-      </th>
-      <th className="border border-slate-400 min-w-[100px] bg-blue-300  ">P</th>
-      <th className="border border-slate-400 min-w-[100px] bg-green-300  ">
-        R
-      </th>
-      <th className="border border-slate-400 min-w-[100px] bg-blue-300  ">P</th>
-      <th className="border border-slate-400 min-w-[100px] bg-green-300  ">
-        R
-      </th>
-      <th className="border border-slate-400 min-w-[120px] bg-gray-300  ">
-        Desabilitada
-      </th>
-      <th className="border border-slate-400 min-w-[100px] bg-blue-300  ">P</th>
-      <th className="border border-slate-400 min-w-[100px] bg-green-300  ">
-        R
-      </th>
-      <th className="border border-slate-400 min-w-[100px] bg-blue-300  ">P</th>
-      <th className="border border-slate-400 min-w-[100px] bg-green-300  ">
-        R
-      </th>
-      <th className="border border-slate-400 min-w-[100px] bg-blue-300  ">P</th>
-      <th className="border border-slate-400 min-w-[100px] bg-green-300  ">
-        R
-      </th>
       <th className="border border-slate-400 min-w-[100px] bg-gray-200  ">
         Mac
       </th>
+      <th className="border border-slate-400 min-w-[120px] bg-gray-200  ">
+        Desabilitada
+      </th>
+      {revisions?.map((rev) => (
+        <Fragment key={rev._id}>
+          <th className="border border-slate-400 min-w-[100px] bg-blue-300  ">
+            P
+          </th>
+          <th className="border border-slate-400 min-w-[100px] bg-green-300  ">
+            R
+          </th>
+        </Fragment>
+      ))}
+      {revisions_time?.map((rev) => (
+        <Fragment key={rev._id}>
+          <th className="border border-slate-400 min-w-[100px] bg-blue-300  ">
+            P
+          </th>
+          <th className="border border-slate-400 min-w-[100px] bg-green-300  ">
+            R
+          </th>
+        </Fragment>
+      ))}
     </tr>
   );
 }

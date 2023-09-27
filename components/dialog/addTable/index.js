@@ -8,23 +8,22 @@ import DialogPendingBoard from "./dialogPendingBoard";
 import DialogCreateRow from "./dialogCreateRow";
 import DialogChangeRow from "./dialogChangeRow";
 import DialogConfirmChange from "./dialogConfimChange";
+import { Toaster } from "react-hot-toast";
+import DialogCreateRowMec from "./dialogCreateRowMec";
 
 export default function DialogAddTable({ isOpen, setIsOpen }) {
   const {
-    isOpenMenu,
     setIsOpenMenu,
-    isOpenCreateRow,
+    setIsOpenChangeRowMec,
     setIsOpenCreateRow,
-    isOpenPendingBoard,
     setIsOpenPendingBoard,
-    isOpenChangeRow,
     setIsOpenChangeRow,
-    isOpenConfirmChange,
     setIsOpenConfirmChange,
   } = useContext(BoardContext);
 
   function closePage() {
     setIsOpenMenu(true);
+    setIsOpenChangeRowMec(false);
     setIsOpenCreateRow(false);
     setIsOpenChangeRow(false);
     setIsOpenPendingBoard(false);
@@ -55,6 +54,7 @@ export default function DialogAddTable({ isOpen, setIsOpen }) {
             </div>
             <div className="flex-col bg-white w-full h-full p-5">
               <DialogMenu />
+              <DialogCreateRowMec />
               <DialogPendingBoard />
               <DialogCreateRow />
               <DialogChangeRow />
@@ -63,6 +63,19 @@ export default function DialogAddTable({ isOpen, setIsOpen }) {
           </div>
         </div>
       )}
+      <Toaster
+        position="bottom-right"
+        reverseOrder={false}
+        toastOptions={{
+          // Define default options
+          className: "",
+          duration: 5000,
+          style: {
+            background: "#3b82f6",
+            color: "#fff",
+          },
+        }}
+      />
     </>
   );
 }

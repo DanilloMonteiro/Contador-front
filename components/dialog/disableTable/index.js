@@ -1,10 +1,22 @@
 import { RowContext } from "@/context/RowContext";
 import { X } from "@phosphor-icons/react";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 
 export default function DialogDisableTable({ isOpen, setIsOpen }) {
-  const { desabilitadas, fetchContador, handleCheckboxChangeWrapper } =
-    useContext(RowContext);
+  const { queryData, fetchRow } = useContext(RowContext);
+
+  const [disbledQuantity, setDisabledQuantity] = useState([]);
+
+  function quantityDisabled() {
+    const disabledItems = queryData.filter((item) => item.disabled === true);
+
+    setDisabledQuantity(disabledItems);
+  }
+
+  useEffect(() => {
+    quantityDisabled();
+  }, []);
+
   return (
     <>
       {isOpen && (
@@ -12,7 +24,7 @@ export default function DialogDisableTable({ isOpen, setIsOpen }) {
       )}
       {isOpen && (
         <div className="fixed bg-white w-1/2 h-[90vh] mt-[3vh] drop-shadow-xl z-10">
-          <div className="flex flex-col w-full h-full">
+          <div className="flex flex-col w-full h-full ">
             <div className="flex flex-row ">
               <p className="text-star font-rubik text-white text-2xl bg-blue-500 px-3 pt-2  w-full">
                 Mesas desabilitadas
@@ -21,20 +33,25 @@ export default function DialogDisableTable({ isOpen, setIsOpen }) {
                 className="bg-blue-500 border-2 border-blue-500 text-white px-3 py-1 hover:bg-white hover:text-blue-500"
                 onClick={() => {
                   setIsOpen(false);
-                  fetchContador();
+                  fetchRow(100);
                 }}
               >
                 <X size={32} weight="bold" />
               </button>
             </div>
-            <div className="flex justify-center align-center max-h-[800px] overflow-y-auto my-10">
+            <div className="flex px-9 py-3">
+              <h3>
+                Total de {quantityDisabled?.length} mesa(s) desabilitada(s).
+              </h3>
+            </div>
+            <div className="flex justify-center align-center max-h-[800px] overflow-y-auto mb-10">
               <table
                 className="
                   border-collapse 
-                  border 
+                  border-[1px] 
                   border-slate-400
                   w-[90%]
-                  bg-white"
+                  bg-slate-100"
               >
                 <thead>
                   <tr>
@@ -50,7 +67,7 @@ export default function DialogDisableTable({ isOpen, setIsOpen }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {desabilitadas.map((c) => (
+                  {disbledQuantity.map((c) => (
                     <tr>
                       <td className="border border-slate-400 h-[35px]">
                         <h3 className="text-center">{c.table}</h3>
@@ -61,12 +78,12 @@ export default function DialogDisableTable({ isOpen, setIsOpen }) {
                       <td className="border border-slate-400 h-[35px]">
                         <input
                           className={`w-full px-3 py-1 text-center`}
-                          checked={c.desabled}
+                          checked={c.disabled}
                           onChange={(event) =>
                             handleCheckboxChangeWrapper(event, c._id)
                           }
                           type="checkbox"
-                          name="desabled"
+                          name="disabled"
                         ></input>
                       </td>
                     </tr>

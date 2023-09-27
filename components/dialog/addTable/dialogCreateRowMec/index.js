@@ -1,22 +1,15 @@
 import { BoardContext } from "@/context/BoardContext";
-import { RowContext } from "@/context/RowContext";
-import BoardServices from "@/services/board";
 import ContadorServices from "@/services/contador";
 import { useContext, useState } from "react";
 import toast from "react-hot-toast";
 
-export default function DialogCreateRow() {
+export default function DialogCreateRowMec() {
   const {
-    isOpenCreateRow,
     fetchBoard,
-    setIsOpenChangeRow,
-    setIsOpenPendingBoard,
-    setIsOpenConfirmChange,
-    actualBoardId,
-    actualBoardMac,
-    setIsOpenChangeRowMec,
-    setIsOpenCreateRow,
     setIsOpenMenu,
+    isOpenChangeRowMec,
+    setIsOpenChangeRowMec,
+    actualBoardMac,
   } = useContext(BoardContext);
 
   const [table, setTable] = useState("");
@@ -29,7 +22,6 @@ export default function DialogCreateRow() {
     e.preventDefault();
 
     let successRow = false;
-    let successBoard = false;
 
     try {
       // Crie um novo documento para inserir no MongoDB
@@ -40,8 +32,7 @@ export default function DialogCreateRow() {
         fluig_number: fluigNumber,
         team: `Time ${team}`,
         count_number: 0,
-        board: actualBoardId,
-        digital_table: true,
+        digital_table: false,
       };
 
       try {
@@ -49,9 +40,7 @@ export default function DialogCreateRow() {
 
         await ContadorServices.create(newTable)
           .then((response) => {
-            rowId = response.data.createdRow._id;
             successRow = true;
-
             console.log("Novo item inserido no MongoDB com sucesso");
           })
           .catch((error) => {
@@ -60,37 +49,16 @@ export default function DialogCreateRow() {
               error
             );
           });
-
-        const updatedBoard = {
-          row: rowId,
-          board_free: false,
-        };
-
-        await BoardServices.update(actualBoardId, updatedBoard)
-          .then((response) => {
-            successBoard = true;
-            console.log("Atualizacao de item no MongoDB feita com sucesso");
-          })
-          .catch((error) => {
-            console.error(`Erro ao atualizar o item no banco de dados:`, error);
-          });
       } catch (error) {
         console.log(error);
       }
 
-      if (successBoard == true && successRow == true) {
+      if (successRow == true) {
+        console.log("aqui");
         toast.success(
           "Tudo certo! Mesa criada com sucesso e placa registrada com sucesso!"
         );
-        backToTable();
-      } else if (successBoard == false && successRow == true) {
-        toast.error("Placa não registrada algum erro aconteceu!", {
-          duration: 4000,
-        });
-      } else if (successBoard == true && successRow == false) {
-        toast.error("Mesa não criada algum erro aconteceu!", {
-          duration: 4000,
-        });
+        lastPage();
       } else {
         toast.error("Essa ação nao pode ser concluida ERRO: 402!", {
           duration: 4000,
@@ -110,87 +78,76 @@ export default function DialogCreateRow() {
     }
   };
 
-  function backToTable() {
-    setIsOpenMenu(true);
-    setIsOpenChangeRowMec(false);
-    setIsOpenCreateRow(false);
-    setIsOpenChangeRow(false);
-    setIsOpenPendingBoard(false);
-    setIsOpenConfirmChange(false);
-    setIsOpen(false);
-  }
-
   function lastPage() {
     fetchBoard();
-    setIsOpenPendingBoard(true);
-    setIsOpenCreateRow(false);
+    setIsOpenMenu(true);
+    setIsOpenChangeRowMec(false);
   }
 
   return (
     <>
-      {isOpenCreateRow && (
+      {isOpenChangeRowMec && (
         <>
           <form className="flex flex-col flex-grow h-full">
-            <h2 className="text-3xl ">Dados da mesa</h2>
+            <h2 className="text-3xl ">Dados da mesa mecânica</h2>
             <div className="flex flex-col justify-start gap-5 mt-6 mr-4">
               <div className="flex flex-row justify-between w-full gap-5">
-                <label className="text-xl w-[300px]">Número da mesa:</label>
+                <label className="text-xl w-[300px] ml-3">
+                  Número da mesa:
+                </label>
                 <input
                   className="w-full bg-slate-200 px-2"
                   type="text"
-                  placeholder="Digite o código da mesa..."
                   value={table}
+                  placeholder="Digite o código da mesa..."
                   onChange={(e) => setTable(e.target.value)}
                 />
               </div>
               <div className="flex flex-row justify-between w-full gap-5">
-                <label className="text-xl w-[300px] ">Número da linha:</label>
+                <label className="text-xl w-[300px] ml-3">
+                  Número da linha:
+                </label>
                 <input
                   className="w-full bg-slate-200 px-2"
-                  type="text"
-                  placeholder="Digite o código da linha..."
+                  type="number"
                   value={line}
+                  placeholder="Digite o código da linha..."
                   onChange={(e) => setLine(e.target.value)}
                 />
               </div>
               <div className="flex flex-row justify-between w-full gap-5">
-                <label className="text-xl w-[300px] ">Número do cliente:</label>
+                <label className="text-xl w-[300px] ml-3">
+                  Número do cliente:
+                </label>
                 <input
                   className="w-full bg-slate-200 px-2"
                   type="text"
-                  placeholder="Digite o código do cliente..."
                   value={customer}
+                  placeholder="Digite o código do cliente..."
                   onChange={(e) => setCustomer(e.target.value)}
                 />
               </div>
               <div className="flex flex-row justify-between w-full gap-5">
-                <label className="text-xl w-[300px] ">Número do fluig:</label>
+                <label className="text-xl w-[300px] ml-3">
+                  Número do fluig:
+                </label>
                 <input
                   className="w-full bg-slate-200 px-2"
                   type="number"
-                  placeholder="Digite o número do fluig..."
                   value={fluigNumber}
+                  placeholder="Digite o número do fluig..."
                   onChange={(e) => setFluigNumber(e.target.value)}
                 />
               </div>
               <div className="flex flex-row justify-between w-full gap-5">
-                <label className="text-xl w-[300px] ">Número do time:</label>
+                <label className="text-xl w-[300px] ml-3">
+                  Número do time:
+                </label>
                 <input
                   className="w-full bg-slate-200 px-2"
                   type="number"
-                  placeholder="Digite o código do time..."
                   value={team}
-                  onChange={(e) => setTeam(e.target.value)}
-                />
-              </div>
-              <div className="flex flex-row justify-between w-full gap-5">
-                <label className="text-xl w-[300px] ">Código MAC:</label>
-                <input
-                  className="w-full bg-slate-200 px-2"
-                  type="text"
-                  disabled={true}
-                  placeholder="Digite o código MAC..."
-                  value={actualBoardMac}
+                  placeholder="Digite o código do time..."
                   onChange={(e) => setTeam(e.target.value)}
                 />
               </div>
